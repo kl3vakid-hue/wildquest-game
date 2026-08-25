@@ -10,33 +10,167 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CollectionRouteImport } from './routes/collection'
+import { Route as CreateRouteImport } from './routes/create'
+import { Route as GameRouteImport } from './routes/game'
+import { Route as GroupRouteImport } from './routes/group'
+import { Route as JoinRouteImport } from './routes/join'
+import { Route as LobbyRouteImport } from './routes/lobby'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as RankingsRouteImport } from './routes/rankings'
+import { Route as ResultsRouteImport } from './routes/results'
+import { Route as SpotRouteImport } from './routes/spot'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CollectionRoute = CollectionRouteImport.update({
+  id: '/collection',
+  path: '/collection',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreateRoute = CreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GameRoute = GameRouteImport.update({
+  id: '/game',
+  path: '/game',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GroupRoute = GroupRouteImport.update({
+  id: '/group',
+  path: '/group',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LobbyRoute = LobbyRouteImport.update({
+  id: '/lobby',
+  path: '/lobby',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RankingsRoute = RankingsRouteImport.update({
+  id: '/rankings',
+  path: '/rankings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResultsRoute = ResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SpotRoute = SpotRouteImport.update({
+  id: '/spot',
+  path: '/spot',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/collection': typeof CollectionRoute
+  '/create': typeof CreateRoute
+  '/game': typeof GameRoute
+  '/group': typeof GroupRoute
+  '/join': typeof JoinRoute
+  '/lobby': typeof LobbyRoute
+  '/profile': typeof ProfileRoute
+  '/rankings': typeof RankingsRoute
+  '/results': typeof ResultsRoute
+  '/spot': typeof SpotRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/collection': typeof CollectionRoute
+  '/create': typeof CreateRoute
+  '/game': typeof GameRoute
+  '/group': typeof GroupRoute
+  '/join': typeof JoinRoute
+  '/lobby': typeof LobbyRoute
+  '/profile': typeof ProfileRoute
+  '/rankings': typeof RankingsRoute
+  '/results': typeof ResultsRoute
+  '/spot': typeof SpotRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/collection': typeof CollectionRoute
+  '/create': typeof CreateRoute
+  '/game': typeof GameRoute
+  '/group': typeof GroupRoute
+  '/join': typeof JoinRoute
+  '/lobby': typeof LobbyRoute
+  '/profile': typeof ProfileRoute
+  '/rankings': typeof RankingsRoute
+  '/results': typeof ResultsRoute
+  '/spot': typeof SpotRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/collection'
+    | '/create'
+    | '/game'
+    | '/group'
+    | '/join'
+    | '/lobby'
+    | '/profile'
+    | '/rankings'
+    | '/results'
+    | '/spot'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/collection'
+    | '/create'
+    | '/game'
+    | '/group'
+    | '/join'
+    | '/lobby'
+    | '/profile'
+    | '/rankings'
+    | '/results'
+    | '/spot'
+  id:
+    | '__root__'
+    | '/'
+    | '/collection'
+    | '/create'
+    | '/game'
+    | '/group'
+    | '/join'
+    | '/lobby'
+    | '/profile'
+    | '/rankings'
+    | '/results'
+    | '/spot'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CollectionRoute: typeof CollectionRoute
+  CreateRoute: typeof CreateRoute
+  GameRoute: typeof GameRoute
+  GroupRoute: typeof GroupRoute
+  JoinRoute: typeof JoinRoute
+  LobbyRoute: typeof LobbyRoute
+  ProfileRoute: typeof ProfileRoute
+  RankingsRoute: typeof RankingsRoute
+  ResultsRoute: typeof ResultsRoute
+  SpotRoute: typeof SpotRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +182,91 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/collection': {
+      id: '/collection'
+      path: '/collection'
+      fullPath: '/collection'
+      preLoaderRoute: typeof CollectionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/create': {
+      id: '/create'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof CreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/game': {
+      id: '/game'
+      path: '/game'
+      fullPath: '/game'
+      preLoaderRoute: typeof GameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/group': {
+      id: '/group'
+      path: '/group'
+      fullPath: '/group'
+      preLoaderRoute: typeof GroupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lobby': {
+      id: '/lobby'
+      path: '/lobby'
+      fullPath: '/lobby'
+      preLoaderRoute: typeof LobbyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rankings': {
+      id: '/rankings'
+      path: '/rankings'
+      fullPath: '/rankings'
+      preLoaderRoute: typeof RankingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/results': {
+      id: '/results'
+      path: '/results'
+      fullPath: '/results'
+      preLoaderRoute: typeof ResultsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/spot': {
+      id: '/spot'
+      path: '/spot'
+      fullPath: '/spot'
+      preLoaderRoute: typeof SpotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CollectionRoute: CollectionRoute,
+  CreateRoute: CreateRoute,
+  GameRoute: GameRoute,
+  GroupRoute: GroupRoute,
+  JoinRoute: JoinRoute,
+  LobbyRoute: LobbyRoute,
+  ProfileRoute: ProfileRoute,
+  RankingsRoute: RankingsRoute,
+  ResultsRoute: ResultsRoute,
+  SpotRoute: SpotRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
