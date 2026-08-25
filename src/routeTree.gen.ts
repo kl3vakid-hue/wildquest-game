@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CollectionRouteImport } from './routes/collection'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as GameRouteImport } from './routes/game'
+import { Route as GroupRouteImport } from './routes/group'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as LobbyRouteImport } from './routes/lobby'
 import { Route as RankingsRouteImport } from './routes/rankings'
@@ -36,6 +37,11 @@ const CreateRoute = CreateRouteImport.update({
 const GameRoute = GameRouteImport.update({
   id: '/game',
   path: '/game',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GroupRoute = GroupRouteImport.update({
+  id: '/group',
+  path: '/group',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinRoute = JoinRouteImport.update({
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/collection': typeof CollectionRoute
   '/create': typeof CreateRoute
   '/game': typeof GameRoute
+  '/group': typeof GroupRoute
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/rankings': typeof RankingsRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/collection': typeof CollectionRoute
   '/create': typeof CreateRoute
   '/game': typeof GameRoute
+  '/group': typeof GroupRoute
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/rankings': typeof RankingsRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/collection': typeof CollectionRoute
   '/create': typeof CreateRoute
   '/game': typeof GameRoute
+  '/group': typeof GroupRoute
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/rankings': typeof RankingsRoute
@@ -97,6 +106,7 @@ export interface FileRouteTypes {
     | '/collection'
     | '/create'
     | '/game'
+    | '/group'
     | '/join'
     | '/lobby'
     | '/rankings'
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/collection'
     | '/create'
     | '/game'
+    | '/group'
     | '/join'
     | '/lobby'
     | '/rankings'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/collection'
     | '/create'
     | '/game'
+    | '/group'
     | '/join'
     | '/lobby'
     | '/rankings'
@@ -128,6 +140,7 @@ export interface RootRouteChildren {
   CollectionRoute: typeof CollectionRoute
   CreateRoute: typeof CreateRoute
   GameRoute: typeof GameRoute
+  GroupRoute: typeof GroupRoute
   JoinRoute: typeof JoinRoute
   LobbyRoute: typeof LobbyRoute
   RankingsRoute: typeof RankingsRoute
@@ -162,6 +175,13 @@ declare module '@tanstack/react-router' {
       path: '/game'
       fullPath: '/game'
       preLoaderRoute: typeof GameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/group': {
+      id: '/group'
+      path: '/group'
+      fullPath: '/group'
+      preLoaderRoute: typeof GroupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join': {
@@ -200,6 +220,7 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionRoute: CollectionRoute,
   CreateRoute: CreateRoute,
   GameRoute: GameRoute,
+  GroupRoute: GroupRoute,
   JoinRoute: JoinRoute,
   LobbyRoute: LobbyRoute,
   RankingsRoute: RankingsRoute,
