@@ -17,6 +17,7 @@ import { Route as GroupRouteImport } from './routes/group'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as LobbyRouteImport } from './routes/lobby'
 import { Route as RankingsRouteImport } from './routes/rankings'
+import { Route as ResultsRouteImport } from './routes/results'
 import { Route as SpotRouteImport } from './routes/spot'
 
 const IndexRoute = IndexRouteImport.update({
@@ -59,6 +60,11 @@ const RankingsRoute = RankingsRouteImport.update({
   path: '/rankings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResultsRoute = ResultsRouteImport.update({
+  id: '/results',
+  path: '/results',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SpotRoute = SpotRouteImport.update({
   id: '/spot',
   path: '/spot',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/rankings': typeof RankingsRoute
+  '/results': typeof ResultsRoute
   '/spot': typeof SpotRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/rankings': typeof RankingsRoute
+  '/results': typeof ResultsRoute
   '/spot': typeof SpotRoute
 }
 export interface FileRoutesById {
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/rankings': typeof RankingsRoute
+  '/results': typeof ResultsRoute
   '/spot': typeof SpotRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/lobby'
     | '/rankings'
+    | '/results'
     | '/spot'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/lobby'
     | '/rankings'
+    | '/results'
     | '/spot'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/lobby'
     | '/rankings'
+    | '/results'
     | '/spot'
   fileRoutesById: FileRoutesById
 }
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   JoinRoute: typeof JoinRoute
   LobbyRoute: typeof LobbyRoute
   RankingsRoute: typeof RankingsRoute
+  ResultsRoute: typeof ResultsRoute
   SpotRoute: typeof SpotRoute
 }
 
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RankingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/results': {
+      id: '/results'
+      path: '/results'
+      fullPath: '/results'
+      preLoaderRoute: typeof ResultsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/spot': {
       id: '/spot'
       path: '/spot'
@@ -224,6 +244,7 @@ const rootRouteChildren: RootRouteChildren = {
   JoinRoute: JoinRoute,
   LobbyRoute: LobbyRoute,
   RankingsRoute: RankingsRoute,
+  ResultsRoute: ResultsRoute,
   SpotRoute: SpotRoute,
 }
 export const routeTree = rootRouteImport
