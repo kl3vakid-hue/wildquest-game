@@ -14,6 +14,7 @@ import { Route as CreateRouteImport } from './routes/create'
 import { Route as GameRouteImport } from './routes/game'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as LobbyRouteImport } from './routes/lobby'
+import { Route as SpotRouteImport } from './routes/spot'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +41,11 @@ const LobbyRoute = LobbyRouteImport.update({
   path: '/lobby',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SpotRoute = SpotRouteImport.update({
+  id: '/spot',
+  path: '/spot',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/game': typeof GameRoute
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
+  '/spot': typeof SpotRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/game': typeof GameRoute
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
+  '/spot': typeof SpotRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +70,14 @@ export interface FileRoutesById {
   '/game': typeof GameRoute
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
+  '/spot': typeof SpotRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/create' | '/game' | '/join' | '/lobby'
+  fullPaths: '/' | '/create' | '/game' | '/join' | '/lobby' | '/spot'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/create' | '/game' | '/join' | '/lobby'
-  id: '__root__' | '/' | '/create' | '/game' | '/join' | '/lobby'
+  to: '/' | '/create' | '/game' | '/join' | '/lobby' | '/spot'
+  id: '__root__' | '/' | '/create' | '/game' | '/join' | '/lobby' | '/spot'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +86,7 @@ export interface RootRouteChildren {
   GameRoute: typeof GameRoute
   JoinRoute: typeof JoinRoute
   LobbyRoute: typeof LobbyRoute
+  SpotRoute: typeof SpotRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +126,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LobbyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/spot': {
+      id: '/spot'
+      path: '/spot'
+      fullPath: '/spot'
+      preLoaderRoute: typeof SpotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +142,7 @@ const rootRouteChildren: RootRouteChildren = {
   GameRoute: GameRoute,
   JoinRoute: JoinRoute,
   LobbyRoute: LobbyRoute,
+  SpotRoute: SpotRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
