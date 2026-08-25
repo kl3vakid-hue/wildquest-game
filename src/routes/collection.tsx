@@ -23,7 +23,7 @@ export const Route = createFileRoute("/collection")({
       },
     ],
   }),
-  component: Collection;
+  component: Collection,
 });
 
 function Collection() {
