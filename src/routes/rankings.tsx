@@ -39,7 +39,7 @@ function Rankings() {
   return (
     <ScreenShell
       title="Rankings"
-      subtitle={state.game?.name}
+      subtitle={state.game?.name ?? ""}
       online={state.online}
       pendingCount={state.pendingCount}
     >

@@ -14,6 +14,7 @@ import { Route as CreateRouteImport } from './routes/create'
 import { Route as GameRouteImport } from './routes/game'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as LobbyRouteImport } from './routes/lobby'
+import { Route as RankingsRouteImport } from './routes/rankings'
 import { Route as SpotRouteImport } from './routes/spot'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +42,11 @@ const LobbyRoute = LobbyRouteImport.update({
   path: '/lobby',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RankingsRoute = RankingsRouteImport.update({
+  id: '/rankings',
+  path: '/rankings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SpotRoute = SpotRouteImport.update({
   id: '/spot',
   path: '/spot',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/game': typeof GameRoute
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
+  '/rankings': typeof RankingsRoute
   '/spot': typeof SpotRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/game': typeof GameRoute
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
+  '/rankings': typeof RankingsRoute
   '/spot': typeof SpotRoute
 }
 export interface FileRoutesById {
@@ -70,14 +78,24 @@ export interface FileRoutesById {
   '/game': typeof GameRoute
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
+  '/rankings': typeof RankingsRoute
   '/spot': typeof SpotRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/create' | '/game' | '/join' | '/lobby' | '/spot'
+  fullPaths:
+    '/' | '/create' | '/game' | '/join' | '/lobby' | '/rankings' | '/spot'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/create' | '/game' | '/join' | '/lobby' | '/spot'
-  id: '__root__' | '/' | '/create' | '/game' | '/join' | '/lobby' | '/spot'
+  to: '/' | '/create' | '/game' | '/join' | '/lobby' | '/rankings' | '/spot'
+  id:
+    | '__root__'
+    | '/'
+    | '/create'
+    | '/game'
+    | '/join'
+    | '/lobby'
+    | '/rankings'
+    | '/spot'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -86,6 +104,7 @@ export interface RootRouteChildren {
   GameRoute: typeof GameRoute
   JoinRoute: typeof JoinRoute
   LobbyRoute: typeof LobbyRoute
+  RankingsRoute: typeof RankingsRoute
   SpotRoute: typeof SpotRoute
 }
 
@@ -126,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LobbyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rankings': {
+      id: '/rankings'
+      path: '/rankings'
+      fullPath: '/rankings'
+      preLoaderRoute: typeof RankingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/spot': {
       id: '/spot'
       path: '/spot'
@@ -142,6 +168,7 @@ const rootRouteChildren: RootRouteChildren = {
   GameRoute: GameRoute,
   JoinRoute: JoinRoute,
   LobbyRoute: LobbyRoute,
+  RankingsRoute: RankingsRoute,
   SpotRoute: SpotRoute,
 }
 export const routeTree = rootRouteImport
