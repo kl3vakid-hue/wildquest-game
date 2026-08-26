@@ -1,6 +1,7 @@
 import { Check, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { RARITY_RING, RARITY_TOKEN } from "@/data/animals";
+import { ANIMAL_PHOTOS } from "@/data/animalPhotos";
 import type { Animal } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +16,7 @@ interface AnimalCardProps {
 export function AnimalCard({ animal, spotted, mode = "spot", onSelect }: AnimalCardProps) {
   const locked = mode === "collection" && !spotted;
   const disabled = mode === "spot" && spotted && !animal.repeatable;
+  const photo = ANIMAL_PHOTOS[animal.id];
 
   return (
     <motion.button
@@ -23,28 +25,47 @@ export function AnimalCard({ animal, spotted, mode = "spot", onSelect }: AnimalC
       onClick={() => !disabled && onSelect?.(animal)}
       disabled={disabled || mode === "collection"}
       className={cn(
-        "surface relative flex aspect-[3/4] w-full flex-col items-center justify-center gap-1 border-2 p-2 text-center transition-opacity",
+        "surface relative flex aspect-[3/4] w-full flex-col overflow-hidden border-2 text-center transition-opacity",
         RARITY_RING[animal.rarity],
         disabled && "opacity-60",
         mode === "collection" && "cursor-default",
       )}
     >
-      <span
-        aria-hidden
-        className={cn(
-          "text-5xl transition-all",
-          locked && "brightness-0 opacity-35 grayscale",
+      <div className="relative h-[58%] w-full overflow-hidden bg-secondary">
+        {photo ? (
+          <img
+            src={photo}
+            alt={locked ? "Undiscovered species" : animal.name}
+            loading="lazy"
+            decoding="async"
+            className={cn(
+              "size-full object-cover transition-all duration-300",
+              locked && "brightness-[0.15] grayscale contrast-200",
+            )}
+          />
+        ) : (
+          <span
+            aria-hidden
+            className={cn(
+              "flex size-full items-center justify-center text-4xl",
+              locked && "brightness-0 opacity-35 grayscale",
+            )}
+          >
+            {animal.image}
+          </span>
         )}
-      >
-        {animal.image}
-      </span>
-      <span className="mt-1 text-xs font-semibold leading-tight">
-        {locked ? "?" : animal.name}
-      </span>
-      <span className="text-[11px] font-bold text-primary">{animal.points} pts</span>
-      <span className={cn("text-[10px] uppercase tracking-wide", RARITY_TOKEN[animal.rarity])}>
-        {animal.rarity}
-      </span>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-card to-transparent" />
+      </div>
+
+      <div className="flex flex-1 flex-col items-center justify-center gap-0.5 px-1.5 pb-1.5">
+        <span className="text-xs font-semibold leading-tight">
+          {locked ? "?" : animal.name}
+        </span>
+        <span className="text-[11px] font-bold text-primary">{animal.points} pts</span>
+        <span className={cn("text-[10px] uppercase tracking-wide", RARITY_TOKEN[animal.rarity])}>
+          {animal.rarity}
+        </span>
+      </div>
 
       {spotted ? (
         <span className="absolute right-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-accent px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent-foreground">
