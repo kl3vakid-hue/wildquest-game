@@ -13,6 +13,9 @@ import type { Animal, Rarity } from "@/types";
 
 export const Route = createFileRoute("/spot")({
   ssr: false,
+  validateSearch: (search: Record<string, unknown>): { q?: string } => ({
+    q: typeof search["q"] === "string" ? search["q"] : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Spot an Animal — WildQuest" },
@@ -33,9 +36,11 @@ export const Route = createFileRoute("/spot")({
 function Spot() {
   const navigate = useNavigate();
   const state = useGameSession();
-  const [query, setQuery] = useState("");
+  const { q } = Route.useSearch();
+  const [query, setQuery] = useState(q ?? "");
   const [rarity, setRarity] = useState<Rarity | "All">("All");
   const [burst, setBurst] = useState<Animal | null>(null);
+
 
   useEffect(() => {
     if (state.ready && !state.session) navigate({ to: "/" });
