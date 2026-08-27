@@ -13,9 +13,10 @@ import type { Animal, Rarity } from "@/types";
 
 export const Route = createFileRoute("/spot")({
   ssr: false,
-  validateSearch: (search: Record<string, unknown>): { q?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { q?: string | undefined } => ({
     q: typeof search["q"] === "string" ? search["q"] : undefined,
   }),
+
   head: () => ({
     meta: [
       { title: "Spot an Animal — WildQuest" },
