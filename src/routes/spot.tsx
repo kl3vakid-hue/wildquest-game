@@ -152,6 +152,22 @@ function Spot() {
           No animals match that search.
         </p>
       ) : null}
+
+      <Link
+        to="/identify"
+        className="surface mt-6 flex items-center gap-3 p-4 text-left transition active:brightness-110"
+      >
+        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
+          <Camera className="size-5" />
+        </span>
+        <span className="min-w-0">
+          <span className="block text-sm font-semibold text-foreground">Can&apos;t find your animal?</span>
+          <span className="block text-xs text-muted-foreground">
+            Take a photo and let AI identify the species.
+          </span>
+        </span>
+      </Link>
     </ScreenShell>
+
   );
 }
