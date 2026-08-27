@@ -1,6 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { Camera, Search } from "lucide-react";
+
 import { toast } from "sonner";
 import { AnimalCard } from "@/components/AnimalCard";
 import { PointsBurst } from "@/components/PointsBurst";
@@ -13,6 +14,10 @@ import type { Animal, Rarity } from "@/types";
 
 export const Route = createFileRoute("/spot")({
   ssr: false,
+  validateSearch: (search: Record<string, unknown>): { q?: string | undefined } => ({
+    q: typeof search["q"] === "string" ? search["q"] : undefined,
+  }),
+
   head: () => ({
     meta: [
       { title: "Spot an Animal — WildQuest" },
@@ -33,9 +38,11 @@ export const Route = createFileRoute("/spot")({
 function Spot() {
   const navigate = useNavigate();
   const state = useGameSession();
-  const [query, setQuery] = useState("");
+  const { q } = Route.useSearch();
+  const [query, setQuery] = useState(q ?? "");
   const [rarity, setRarity] = useState<Rarity | "All">("All");
   const [burst, setBurst] = useState<Animal | null>(null);
+
 
   useEffect(() => {
     if (state.ready && !state.session) navigate({ to: "/" });
@@ -146,6 +153,22 @@ function Spot() {
           No animals match that search.
         </p>
       ) : null}
+
+      <Link
+        to="/identify"
+        className="surface mt-6 flex items-center gap-3 p-4 text-left transition active:brightness-110"
+      >
+        <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
+          <Camera className="size-5" />
+        </span>
+        <span className="min-w-0">
+          <span className="block text-sm font-semibold text-foreground">Can&apos;t find your animal?</span>
+          <span className="block text-xs text-muted-foreground">
+            Take a photo and let AI identify the species.
+          </span>
+        </span>
+      </Link>
     </ScreenShell>
+
   );
 }

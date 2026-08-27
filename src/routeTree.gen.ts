@@ -14,6 +14,7 @@ import { Route as CollectionRouteImport } from './routes/collection'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as GameRouteImport } from './routes/game'
 import { Route as GroupRouteImport } from './routes/group'
+import { Route as IdentifyRouteImport } from './routes/identify'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as LobbyRouteImport } from './routes/lobby'
 import { Route as ProfileRouteImport } from './routes/profile'
@@ -44,6 +45,11 @@ const GameRoute = GameRouteImport.update({
 const GroupRoute = GroupRouteImport.update({
   id: '/group',
   path: '/group',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IdentifyRoute = IdentifyRouteImport.update({
+  id: '/identify',
+  path: '/identify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinRoute = JoinRouteImport.update({
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/create': typeof CreateRoute
   '/game': typeof GameRoute
   '/group': typeof GroupRoute
+  '/identify': typeof IdentifyRoute
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/profile': typeof ProfileRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/create': typeof CreateRoute
   '/game': typeof GameRoute
   '/group': typeof GroupRoute
+  '/identify': typeof IdentifyRoute
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/profile': typeof ProfileRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/create': typeof CreateRoute
   '/game': typeof GameRoute
   '/group': typeof GroupRoute
+  '/identify': typeof IdentifyRoute
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/profile': typeof ProfileRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/game'
     | '/group'
+    | '/identify'
     | '/join'
     | '/lobby'
     | '/profile'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/game'
     | '/group'
+    | '/identify'
     | '/join'
     | '/lobby'
     | '/profile'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/game'
     | '/group'
+    | '/identify'
     | '/join'
     | '/lobby'
     | '/profile'
@@ -165,6 +177,7 @@ export interface RootRouteChildren {
   CreateRoute: typeof CreateRoute
   GameRoute: typeof GameRoute
   GroupRoute: typeof GroupRoute
+  IdentifyRoute: typeof IdentifyRoute
   JoinRoute: typeof JoinRoute
   LobbyRoute: typeof LobbyRoute
   ProfileRoute: typeof ProfileRoute
@@ -208,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/group'
       fullPath: '/group'
       preLoaderRoute: typeof GroupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/identify': {
+      id: '/identify'
+      path: '/identify'
+      fullPath: '/identify'
+      preLoaderRoute: typeof IdentifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join': {
@@ -261,6 +281,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreateRoute: CreateRoute,
   GameRoute: GameRoute,
   GroupRoute: GroupRoute,
+  IdentifyRoute: IdentifyRoute,
   JoinRoute: JoinRoute,
   LobbyRoute: LobbyRoute,
   ProfileRoute: ProfileRoute,
