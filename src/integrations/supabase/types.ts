@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      animal_identifications: {
+        Row: {
+          animal_name: string
+          confidence: number | null
+          created_at: string
+          description: string | null
+          device_id: string
+          game_id: string | null
+          habitat: string | null
+          id: string
+          image_path: string | null
+          in_south_africa: boolean | null
+          interesting_facts: string[]
+          player_id: string | null
+          scientific_name: string | null
+          user_id: string | null
+        }
+        Insert: {
+          animal_name: string
+          confidence?: number | null
+          created_at?: string
+          description?: string | null
+          device_id: string
+          game_id?: string | null
+          habitat?: string | null
+          id?: string
+          image_path?: string | null
+          in_south_africa?: boolean | null
+          interesting_facts?: string[]
+          player_id?: string | null
+          scientific_name?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          animal_name?: string
+          confidence?: number | null
+          created_at?: string
+          description?: string | null
+          device_id?: string
+          game_id?: string | null
+          habitat?: string | null
+          id?: string
+          image_path?: string | null
+          in_south_africa?: boolean | null
+          interesting_facts?: string[]
+          player_id?: string | null
+          scientific_name?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "animal_identifications_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "animal_identifications_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           code: string
