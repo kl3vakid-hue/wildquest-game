@@ -22,3 +22,16 @@ export function aiAnimalId(name: string): string {
 export function isAiAnimalId(id: string): boolean {
   return id.startsWith(AI_ANIMAL_PREFIX);
 }
+
+/** Points awarded for an AI-identified animal, by rarity band. */
+export const AI_RARITY_POINTS: Record<Rarity, number> = {
+  Common: 20,
+  Uncommon: 50,
+  Rare: 75,
+  "Very Rare": 120,
+  Legendary: 150,
+};
+
+export function aiPointsFor(rarity: Rarity | null): number {
+  return AI_RARITY_POINTS[rarity ?? AI_ANIMAL_RARITY];
+}
