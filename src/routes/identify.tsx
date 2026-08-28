@@ -457,12 +457,21 @@ function Identify() {
                   </p>
                 </div>
                 <button
+                  onClick={() => void handleSpotDiscovery(row.animal_name)}
+                  disabled={state.myAnimalIds.has(aiAnimalId(row.animal_name))}
+                  aria-label={`Spot ${row.animal_name}`}
+                  className="rounded-xl border border-border p-2 text-primary disabled:opacity-40"
+                >
+                  <PawPrint className="size-4" />
+                </button>
+                <button
                   onClick={() => void handleDelete(row)}
                   aria-label={`Delete ${row.animal_name} identification`}
                   className="rounded-xl border border-border p-2 text-muted-foreground"
                 >
                   <Trash2 className="size-4" />
                 </button>
+
               </li>
             ))}
           </ul>
