@@ -7,6 +7,7 @@ import {
   ImageUp,
   Loader2,
   MapPin,
+  PawPrint,
   Sparkles,
   Trash2,
   X,
@@ -15,9 +16,16 @@ import { toast } from "sonner";
 import { Button } from "@/components/Button";
 import { ScreenShell } from "@/components/ScreenShell";
 import { ANIMALS } from "@/data/animals";
+import {
+  AI_ANIMAL_POINTS,
+  AI_ANIMAL_RARITY,
+  aiAnimalId,
+} from "@/data/discovered";
 import { useGameSession } from "@/hooks/useGameSession";
 import type { IdentificationResult } from "@/lib/identify.functions";
 import { identifyAnimal } from "@/lib/identify.functions";
+import { recordSighting } from "@/services/gameService";
+import { enqueueSighting } from "@/services/offlineQueue";
 import {
   deleteIdentification,
   getPhotoUrl,
@@ -27,6 +35,7 @@ import {
   type StoredIdentification,
 } from "@/services/identifyService";
 import { getDeviceId } from "@/utils/session";
+
 
 export const Route = createFileRoute("/identify")({
   ssr: false,
