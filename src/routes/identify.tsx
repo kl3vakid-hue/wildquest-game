@@ -416,6 +416,19 @@ function Identify() {
               identification matters.
             </span>
           </p>
+
+          {result.animalName ? (
+            <Button
+              onClick={() => void handleSpotDiscovery(result.animalName!)}
+              disabled={state.myAnimalIds.has(aiAnimalId(result.animalName))}
+            >
+              <PawPrint className="size-5" />
+              {state.myAnimalIds.has(aiAnimalId(result.animalName))
+                ? "Already in your collection"
+                : `Spot This Animal · +${AI_ANIMAL_POINTS} pts`}
+            </Button>
+          ) : null}
+
         </div>
       ) : null}
 
