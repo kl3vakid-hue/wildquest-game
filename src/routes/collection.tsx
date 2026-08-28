@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { AnimalCard } from "@/components/AnimalCard";
 import { ScreenShell } from "@/components/ScreenShell";
 import { ANIMALS, RARITY_ORDER, TOTAL_ANIMALS } from "@/data/animals";
+import { isAiAnimalId } from "@/data/discovered";
 import { useGameSession } from "@/hooks/useGameSession";
 import { formatPoints } from "@/utils/format";
 
@@ -34,7 +35,12 @@ function Collection() {
     if (state.ready && !state.session) navigate({ to: "/" });
   }, [state.ready, state.session, navigate]);
 
-  const found = state.myAnimalIds.size;
+  const found = ANIMALS.filter((a) => state.myAnimalIds.has(a.id)).length;
+  const discoveries = Array.from(
+    new Map(
+      state.mySightings.filter((s) => isAiAnimalId(s.animal_id)).map((s) => [s.animal_id, s]),
+    ).values(),
+  );
 
   return (
     <ScreenShell
@@ -76,6 +82,30 @@ function Collection() {
           </section>
         );
       })}
+
+      {discoveries.length ? (
+        <section className="mt-6">
+          <div className="mb-2 flex items-baseline justify-between">
+            <h2 className="display text-xl tracking-wide">AI Discoveries</h2>
+            <span className="text-xs text-muted-foreground">{discoveries.length}</span>
+          </div>
+          <ul className="space-y-2">
+            {discoveries.map((sighting) => (
+              <li
+                key={sighting.animal_id}
+                className="surface flex items-center justify-between gap-3 px-4 py-3"
+              >
+                <span className="min-w-0 truncate text-sm font-semibold text-foreground">
+                  {sighting.animal_name}
+                </span>
+                <span className="shrink-0 text-xs font-semibold text-primary">
+                  +{formatPoints(sighting.points)} pts
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </ScreenShell>
   );
 }
