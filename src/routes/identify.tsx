@@ -201,6 +201,43 @@ function Identify() {
     }
   }
 
+  async function handleSpotDiscovery(name: string) {
+    if (!state.session || !state.me) {
+      toast.info("Join or create a game first to earn points.");
+      return;
+    }
+    const animalId = aiAnimalId(name);
+    if (state.myAnimalIds.has(animalId)) {
+      toast.info(`${name} is already in your collection`);
+      return;
+    }
+    const payload = {
+      gameId: state.session.gameId,
+      playerId: state.session.playerId,
+      animalId,
+      animalName: name,
+      rarity: AI_ANIMAL_RARITY,
+      points: AI_ANIMAL_POINTS,
+    };
+
+    if (!state.online) {
+      enqueueSighting({ localId: `${animalId}-${Date.now()}`, createdAt: new Date().toISOString(), ...payload });
+      toast.success(`${name} saved offline · +${AI_ANIMAL_POINTS} pts`);
+      state.refresh();
+      return;
+    }
+
+    try {
+      await recordSighting(payload);
+      toast.success(`${name} spotted · +${AI_ANIMAL_POINTS} pts`);
+      state.refresh();
+    } catch {
+      enqueueSighting({ localId: `${animalId}-${Date.now()}`, createdAt: new Date().toISOString(), ...payload });
+      toast.error("Saved offline — will sync when you have signal");
+    }
+  }
+
+
   async function handleDelete(row: StoredIdentification) {
     if (!window.confirm(`Delete your ${row.animal_name} identification and its photo?`)) return;
     try {
