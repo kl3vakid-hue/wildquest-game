@@ -1,12 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { AnimalCard } from "@/components/AnimalCard";
 import { ScreenShell } from "@/components/ScreenShell";
 import { ANIMALS, RARITY_ORDER, TOTAL_ANIMALS } from "@/data/animals";
-import { isAiAnimalId } from "@/data/discovered";
+import { AI_ANIMAL_RARITY, isAiAnimalId } from "@/data/discovered";
 import { useGameSession } from "@/hooks/useGameSession";
+import { getPhotoUrl, listMyIdentifications } from "@/services/identifyService";
+import type { Animal, Rarity } from "@/types";
 import { formatPoints } from "@/utils/format";
+import { getDeviceId } from "@/utils/session";
 
 export const Route = createFileRoute("/collection")({
   ssr: false,
@@ -30,22 +33,62 @@ export const Route = createFileRoute("/collection")({
 function Collection() {
   const navigate = useNavigate();
   const state = useGameSession();
+  const [photos, setPhotos] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (state.ready && !state.session) navigate({ to: "/" });
   }, [state.ready, state.session, navigate]);
 
+  // Photos the player took for their AI-identified animals, keyed by animal name.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const rows = await listMyIdentifications(getDeviceId());
+        const map: Record<string, string> = {};
+        await Promise.all(
+          rows.map(async (row) => {
+            if (!row.image_path) return;
+            const key = row.animal_name.toLowerCase();
+            if (map[key]) return;
+            const url = await getPhotoUrl(row.image_path);
+            if (url) map[key] = url;
+          }),
+        );
+        if (!cancelled) setPhotos(map);
+      } catch {
+        /* photos are non-critical */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  /** AI-identified animals become collection cards in their own rarity band. */
+  const discovered = useMemo<Animal[]>(() => {
+    const byId = new Map<string, Animal>();
+    for (const sighting of state.mySightings) {
+      if (!isAiAnimalId(sighting.animal_id) || byId.has(sighting.animal_id)) continue;
+      byId.set(sighting.animal_id, {
+        id: sighting.animal_id,
+        name: sighting.animal_name,
+        points: sighting.points,
+        rarity: (sighting.rarity as Rarity) ?? AI_ANIMAL_RARITY,
+        image: "📸",
+      });
+    }
+    return Array.from(byId.values());
+  }, [state.mySightings]);
+
   const found = ANIMALS.filter((a) => state.myAnimalIds.has(a.id)).length;
-  const discoveries = Array.from(
-    new Map(
-      state.mySightings.filter((s) => isAiAnimalId(s.animal_id)).map((s) => [s.animal_id, s]),
-    ).values(),
-  );
 
   return (
     <ScreenShell
       title="Collection"
-      subtitle={`${found} of ${TOTAL_ANIMALS} species · ${formatPoints(state.myScore)} pts`}
+      subtitle={`${found} of ${TOTAL_ANIMALS} species${
+        discovered.length ? ` · ${discovered.length} AI finds` : ""
+      } · ${formatPoints(state.myScore)} pts`}
       online={state.online}
       pendingCount={state.pendingCount}
     >
@@ -60,13 +103,14 @@ function Collection() {
 
       {RARITY_ORDER.map((rarity) => {
         const animals = ANIMALS.filter((animal) => animal.rarity === rarity);
+        const extras = discovered.filter((animal) => animal.rarity === rarity);
         const unlocked = animals.filter((a) => state.myAnimalIds.has(a.id)).length;
         return (
           <section key={rarity} className="mt-6">
             <div className="mb-2 flex items-baseline justify-between">
               <h2 className="display text-xl tracking-wide">{rarity}</h2>
               <span className="text-xs text-muted-foreground">
-                {unlocked}/{animals.length}
+                {unlocked + extras.length}/{animals.length + extras.length}
               </span>
             </div>
             <div className="grid grid-cols-3 gap-3">
@@ -78,34 +122,19 @@ function Collection() {
                   mode="collection"
                 />
               ))}
+              {extras.map((animal) => (
+                <AnimalCard
+                  key={animal.id}
+                  animal={animal}
+                  spotted
+                  mode="collection"
+                  photoUrl={photos[animal.name.toLowerCase()]}
+                />
+              ))}
             </div>
           </section>
         );
       })}
-
-      {discoveries.length ? (
-        <section className="mt-6">
-          <div className="mb-2 flex items-baseline justify-between">
-            <h2 className="display text-xl tracking-wide">AI Discoveries</h2>
-            <span className="text-xs text-muted-foreground">{discoveries.length}</span>
-          </div>
-          <ul className="space-y-2">
-            {discoveries.map((sighting) => (
-              <li
-                key={sighting.animal_id}
-                className="surface flex items-center justify-between gap-3 px-4 py-3"
-              >
-                <span className="min-w-0 truncate text-sm font-semibold text-foreground">
-                  {sighting.animal_name}
-                </span>
-                <span className="shrink-0 text-xs font-semibold text-primary">
-                  +{formatPoints(sighting.points)} pts
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
     </ScreenShell>
   );
 }
