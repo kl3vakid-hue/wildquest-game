@@ -15,7 +15,13 @@ interface AnimalCardProps {
   onSelect?: (animal: Animal) => void;
 }
 
-export function AnimalCard({ animal, spotted, mode = "spot", photoUrl, onSelect }: AnimalCardProps) {
+export function AnimalCard({
+  animal,
+  spotted,
+  mode = "spot",
+  photoUrl,
+  onSelect,
+}: AnimalCardProps) {
   const locked = mode === "collection" && !spotted;
   const disabled = mode === "spot" && spotted && !animal.repeatable;
   const photo = photoUrl ?? ANIMAL_PHOTOS[animal.id];
@@ -60,9 +66,7 @@ export function AnimalCard({ animal, spotted, mode = "spot", photoUrl, onSelect 
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center gap-0.5 px-1.5 pb-1.5">
-        <span className="text-xs font-semibold leading-tight">
-          {locked ? "?" : animal.name}
-        </span>
+        <span className="text-xs font-semibold leading-tight">{locked ? "?" : animal.name}</span>
         <span className="text-[11px] font-bold text-primary">{animal.points} pts</span>
         <span className={cn("text-[10px] uppercase tracking-wide", RARITY_TOKEN[animal.rarity])}>
           {animal.rarity}

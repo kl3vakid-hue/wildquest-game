@@ -18,7 +18,8 @@ export const Route = createFileRoute("/collection")({
       { title: "My Collection — WildQuest" },
       {
         name: "description",
-        content: "Your personal wildlife checklist: every South African species you have spotted, grouped by rarity.",
+        content:
+          "Your personal wildlife checklist: every South African species you have spotted, grouped by rarity.",
       },
       { property: "og:title", content: "My Collection — WildQuest" },
       {
