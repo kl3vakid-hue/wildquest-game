@@ -10,13 +10,21 @@ interface AnimalCardProps {
   spotted: boolean;
   /** Collection mode shows unspotted animals as dark silhouettes. */
   mode?: "spot" | "collection";
+  /** Overrides the built-in photo, e.g. the user's own AI-identified photo. */
+  photoUrl?: string | undefined;
   onSelect?: (animal: Animal) => void;
 }
 
-export function AnimalCard({ animal, spotted, mode = "spot", onSelect }: AnimalCardProps) {
+export function AnimalCard({
+  animal,
+  spotted,
+  mode = "spot",
+  photoUrl,
+  onSelect,
+}: AnimalCardProps) {
   const locked = mode === "collection" && !spotted;
   const disabled = mode === "spot" && spotted && !animal.repeatable;
-  const photo = ANIMAL_PHOTOS[animal.id];
+  const photo = photoUrl ?? ANIMAL_PHOTOS[animal.id];
 
   return (
     <motion.button
@@ -58,9 +66,7 @@ export function AnimalCard({ animal, spotted, mode = "spot", onSelect }: AnimalC
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center gap-0.5 px-1.5 pb-1.5">
-        <span className="text-xs font-semibold leading-tight">
-          {locked ? "?" : animal.name}
-        </span>
+        <span className="text-xs font-semibold leading-tight">{locked ? "?" : animal.name}</span>
         <span className="text-[11px] font-bold text-primary">{animal.points} pts</span>
         <span className={cn("text-[10px] uppercase tracking-wide", RARITY_TOKEN[animal.rarity])}>
           {animal.rarity}

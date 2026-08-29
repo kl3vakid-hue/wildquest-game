@@ -16,11 +16,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/Button";
 import { ScreenShell } from "@/components/ScreenShell";
 import { ANIMALS } from "@/data/animals";
-import {
-  AI_ANIMAL_POINTS,
-  AI_ANIMAL_RARITY,
-  aiAnimalId,
-} from "@/data/discovered";
+import { AI_ANIMAL_RARITY, aiAnimalId, aiPointsFor } from "@/data/discovered";
 import { useGameSession } from "@/hooks/useGameSession";
 import type { IdentificationResult } from "@/lib/identify.functions";
 import { identifyAnimal } from "@/lib/identify.functions";
@@ -34,8 +30,8 @@ import {
   uploadPhoto,
   type StoredIdentification,
 } from "@/services/identifyService";
+import type { Rarity } from "@/types";
 import { getDeviceId } from "@/utils/session";
-
 
 export const Route = createFileRoute("/identify")({
   ssr: false,
@@ -72,7 +68,11 @@ async function toCompressedDataUrl(file: File): Promise<{ dataUrl: string; blob:
   ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
   const dataUrl = canvas.toDataURL("image/jpeg", 0.82);
   const blob = await new Promise<Blob>((resolve, reject) =>
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("Could not process that photo."))), "image/jpeg", 0.82),
+    canvas.toBlob(
+      (b) => (b ? resolve(b) : reject(new Error("Could not process that photo."))),
+      "image/jpeg",
+      0.82,
+    ),
   );
   return { dataUrl, blob };
 }
@@ -195,13 +195,15 @@ function Identify() {
         toast.error("Identification saved on screen only — the database was unavailable.");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Identification failed. Please try again.");
+      toast.error(
+        error instanceof Error ? error.message : "Identification failed. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
   }
 
-  async function handleSpotDiscovery(name: string) {
+  async function handleSpotDiscovery(name: string, rarity: Rarity | null) {
     if (!state.session || !state.me) {
       toast.info("Join or create a game first to earn points.");
       return;
@@ -211,32 +213,40 @@ function Identify() {
       toast.info(`${name} is already in your collection`);
       return;
     }
+    const points = aiPointsFor(rarity);
     const payload = {
       gameId: state.session.gameId,
       playerId: state.session.playerId,
       animalId,
       animalName: name,
-      rarity: AI_ANIMAL_RARITY,
-      points: AI_ANIMAL_POINTS,
+      rarity: rarity ?? AI_ANIMAL_RARITY,
+      points,
     };
 
     if (!state.online) {
-      enqueueSighting({ localId: `${animalId}-${Date.now()}`, createdAt: new Date().toISOString(), ...payload });
-      toast.success(`${name} saved offline · +${AI_ANIMAL_POINTS} pts`);
+      enqueueSighting({
+        localId: `${animalId}-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        ...payload,
+      });
+      toast.success(`${name} saved offline · +${points} pts`);
       state.refresh();
       return;
     }
 
     try {
       await recordSighting(payload);
-      toast.success(`${name} spotted · +${AI_ANIMAL_POINTS} pts`);
+      toast.success(`${name} spotted · +${points} pts`);
       state.refresh();
     } catch {
-      enqueueSighting({ localId: `${animalId}-${Date.now()}`, createdAt: new Date().toISOString(), ...payload });
+      enqueueSighting({
+        localId: `${animalId}-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        ...payload,
+      });
       toast.error("Saved offline — will sync when you have signal");
     }
   }
-
 
   async function handleDelete(row: StoredIdentification) {
     if (!window.confirm(`Delete your ${row.animal_name} identification and its photo?`)) return;
@@ -275,7 +285,11 @@ function Identify() {
       {preview ? (
         <div className="surface overflow-hidden p-0">
           <div className="relative">
-            <img src={preview.dataUrl} alt="Photo of the animal to identify" className="w-full object-cover" />
+            <img
+              src={preview.dataUrl}
+              alt="Photo of the animal to identify"
+              className="w-full object-cover"
+            />
             <button
               onClick={clearPhoto}
               aria-label="Remove photo"
@@ -312,8 +326,8 @@ function Identify() {
             className="mt-0.5 size-4 accent-[hsl(var(--primary))]"
           />
           <span>
-            Save my photo with the identification. Leave this unticked and only the text result is stored. You can
-            delete saved photos below at any time.
+            Save my photo with the identification. Leave this unticked and only the text result is
+            stored. You can delete saved photos below at any time.
           </span>
         </label>
 
@@ -335,8 +349,8 @@ function Identify() {
             <AlertTriangle className="size-5 text-primary" /> Not confident enough
           </div>
           <p className="text-sm text-muted-foreground">
-            We couldn&apos;t identify this animal with enough confidence. Try taking another photo with the animal
-            clearly visible.
+            We couldn&apos;t identify this animal with enough confidence. Try taking another photo
+            with the animal clearly visible.
           </p>
           <Button variant="secondary" onClick={() => cameraRef.current?.click()}>
             <Camera className="size-5" /> Take Another Photo
@@ -349,7 +363,9 @@ function Identify() {
           <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
             <CheckCircle2 className="size-5 text-primary" /> {known.image} {known.name}
           </div>
-          <p className="text-sm text-muted-foreground">This animal is already in our Spot an Animal list!</p>
+          <p className="text-sm text-muted-foreground">
+            This animal is already in our Spot an Animal list!
+          </p>
           <Button onClick={() => navigate({ to: "/spot", search: { q: known.name } })}>
             View {known.name} in Spot an Animal
           </Button>
@@ -359,8 +375,12 @@ function Identify() {
       {result?.status === "identified" && !known ? (
         <div className="surface mt-5 space-y-4 p-5">
           <div>
-            <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Likely species</p>
-            <h2 className="display mt-1 text-3xl leading-none text-gold-gradient">{result.animalName}</h2>
+            <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+              Likely species
+            </p>
+            <h2 className="display mt-1 text-3xl leading-none text-gold-gradient">
+              {result.animalName}
+            </h2>
             {result.scientificName ? (
               <p className="text-sm italic text-muted-foreground">{result.scientificName}</p>
             ) : null}
@@ -370,15 +390,22 @@ function Identify() {
             <div>
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>AI confidence</span>
-                <span className="font-semibold text-foreground">{Math.round(result.confidence)}%</span>
+                <span className="font-semibold text-foreground">
+                  {Math.round(result.confidence)}%
+                </span>
               </div>
               <div className="mt-1 h-2 overflow-hidden rounded-full bg-secondary">
-                <div className="h-full rounded-full bg-primary" style={{ width: `${result.confidence}%` }} />
+                <div
+                  className="h-full rounded-full bg-primary"
+                  style={{ width: `${result.confidence}%` }}
+                />
               </div>
             </div>
           ) : null}
 
-          {result.description ? <p className="text-sm text-foreground/90">{result.description}</p> : null}
+          {result.description ? (
+            <p className="text-sm text-foreground/90">{result.description}</p>
+          ) : null}
 
           {result.habitat ? (
             <div className="flex gap-2 text-sm text-muted-foreground">
@@ -389,7 +416,9 @@ function Identify() {
 
           {result.interestingFacts.length ? (
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Interesting facts</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                Interesting facts
+              </p>
               <ul className="mt-2 space-y-1.5 text-sm text-foreground/90">
                 {result.interestingFacts.map((fact) => (
                   <li key={fact} className="flex gap-2">
@@ -412,29 +441,32 @@ function Identify() {
           <p className="flex gap-2 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-xs text-primary">
             <AlertTriangle className="mt-0.5 size-4 shrink-0" />
             <span>
-              AI identification can be incorrect. Please verify with a guide or field guide book if the
-              identification matters.
+              AI identification can be incorrect. Please verify with a guide or field guide book if
+              the identification matters.
             </span>
           </p>
 
           {result.animalName ? (
             <Button
-              onClick={() => void handleSpotDiscovery(result.animalName!)}
+              onClick={() => void handleSpotDiscovery(result.animalName!, result.rarity)}
               disabled={state.myAnimalIds.has(aiAnimalId(result.animalName))}
             >
               <PawPrint className="size-5" />
               {state.myAnimalIds.has(aiAnimalId(result.animalName))
                 ? "Already in your collection"
-                : `Spot This Animal · +${AI_ANIMAL_POINTS} pts`}
+                : `Spot This Animal · +${aiPointsFor(result.rarity)} pts${
+                    result.rarity ? ` · ${result.rarity}` : ""
+                  }`}
             </Button>
           ) : null}
-
         </div>
       ) : null}
 
       {history.length ? (
         <section className="mt-8">
-          <h2 className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Your identifications</h2>
+          <h2 className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
+            Your identifications
+          </h2>
           <ul className="mt-3 space-y-3">
             {history.map((row) => (
               <li key={row.id} className="surface flex items-center gap-3 p-3">
@@ -450,14 +482,16 @@ function Identify() {
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-foreground">{row.animal_name}</p>
+                  <p className="truncate text-sm font-semibold text-foreground">
+                    {row.animal_name}
+                  </p>
                   <p className="truncate text-xs text-muted-foreground">
                     {row.confidence !== null ? `${Math.round(row.confidence)}% · ` : ""}
                     {new Date(row.created_at).toLocaleDateString()}
                   </p>
                 </div>
                 <button
-                  onClick={() => void handleSpotDiscovery(row.animal_name)}
+                  onClick={() => void handleSpotDiscovery(row.animal_name, row.rarity)}
                   disabled={state.myAnimalIds.has(aiAnimalId(row.animal_name))}
                   aria-label={`Spot ${row.animal_name}`}
                   className="rounded-xl border border-border p-2 text-primary disabled:opacity-40"
@@ -471,7 +505,6 @@ function Identify() {
                 >
                   <Trash2 className="size-4" />
                 </button>
-
               </li>
             ))}
           </ul>

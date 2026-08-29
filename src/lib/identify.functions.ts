@@ -73,9 +73,12 @@ export const identifyAnimal = createServerFn({ method: "POST" })
 
     if (!response.ok) {
       const body = await response.text();
-      if (response.status === 429) throw new Error("The AI service is busy right now. Please try again in a moment.");
-      if (response.status === 402) throw new Error("AI credits are exhausted for this app. Please add credits to continue.");
-      if (response.status === 403) throw new Error("AI access is currently blocked for this workspace.");
+      if (response.status === 429)
+        throw new Error("The AI service is busy right now. Please try again in a moment.");
+      if (response.status === 402)
+        throw new Error("AI credits are exhausted for this app. Please add credits to continue.");
+      if (response.status === 403)
+        throw new Error("AI access is currently blocked for this workspace.");
       throw new Error(`AI identification failed (${response.status}). ${body.slice(0, 200)}`);
     }
 
@@ -83,7 +86,10 @@ export const identifyAnimal = createServerFn({ method: "POST" })
       choices?: { message?: { content?: string } }[];
     };
     const raw = payload.choices?.[0]?.message?.content ?? "";
-    const jsonText = raw.replace(/^```(?:json)?/i, "").replace(/```$/, "").trim();
+    const jsonText = raw
+      .replace(/^```(?:json)?/i, "")
+      .replace(/```$/, "")
+      .trim();
 
     let parsed: Record<string, unknown>;
     try {
@@ -93,12 +99,17 @@ export const identifyAnimal = createServerFn({ method: "POST" })
     }
 
     const confidence =
-      typeof parsed["confidence"] === "number" ? Math.max(0, Math.min(100, parsed["confidence"])) : null;
-    const animalName = typeof parsed["animalName"] === "string" && parsed["animalName"].trim()
-      ? parsed["animalName"].trim()
-      : null;
+      typeof parsed["confidence"] === "number"
+        ? Math.max(0, Math.min(100, parsed["confidence"]))
+        : null;
+    const animalName =
+      typeof parsed["animalName"] === "string" && parsed["animalName"].trim()
+        ? parsed["animalName"].trim()
+        : null;
     const facts = Array.isArray(parsed["interestingFacts"])
-      ? (parsed["interestingFacts"] as unknown[]).filter((f): f is string => typeof f === "string").slice(0, 5)
+      ? (parsed["interestingFacts"] as unknown[])
+          .filter((f): f is string => typeof f === "string")
+          .slice(0, 5)
       : [];
 
     const confident = Boolean(animalName) && (confidence ?? 0) >= 60;
@@ -106,15 +117,15 @@ export const identifyAnimal = createServerFn({ method: "POST" })
     return {
       status: confident ? "identified" : "low_confidence",
       animalName,
-      scientificName: typeof parsed["scientificName"] === "string" ? parsed["scientificName"] : null,
+      scientificName:
+        typeof parsed["scientificName"] === "string" ? parsed["scientificName"] : null,
       confidence,
       description: typeof parsed["description"] === "string" ? parsed["description"] : null,
       habitat: typeof parsed["habitat"] === "string" ? parsed["habitat"] : null,
       interestingFacts: facts,
       inSouthAfrica: typeof parsed["inSouthAfrica"] === "boolean" ? parsed["inSouthAfrica"] : null,
       rarity:
-        typeof parsed["rarity"] === "string" &&
-        RARITIES.includes(parsed["rarity"].trim() as Rarity)
+        typeof parsed["rarity"] === "string" && RARITIES.includes(parsed["rarity"].trim() as Rarity)
           ? (parsed["rarity"].trim() as Rarity)
           : null,
       matchesKnownAnimal:

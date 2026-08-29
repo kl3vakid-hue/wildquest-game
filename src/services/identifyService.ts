@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { IdentificationResult } from "@/lib/identify.functions";
+import type { Rarity } from "@/types";
 
 export const PHOTO_BUCKET = "animal-photos";
 
@@ -12,6 +13,7 @@ export interface StoredIdentification {
   habitat: string | null;
   interesting_facts: string[];
   in_south_africa: boolean | null;
+  rarity: Rarity | null;
   image_path: string | null;
   created_at: string;
 }
@@ -53,6 +55,7 @@ export async function saveIdentification(args: {
       habitat: result.habitat,
       interesting_facts: result.interestingFacts,
       in_south_africa: result.inSouthAfrica,
+      rarity: result.rarity,
       image_path: args.imagePath ?? null,
     })
     .select()
