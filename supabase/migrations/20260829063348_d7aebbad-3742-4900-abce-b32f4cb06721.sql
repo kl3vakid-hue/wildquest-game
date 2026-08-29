@@ -1,0 +1,1 @@
+ALTER TABLE public.animal_identifications ADD COLUMN IF NOT EXISTS rarity text;

@@ -28,6 +28,7 @@ export type Database = {
           in_south_africa: boolean | null
           interesting_facts: string[]
           player_id: string | null
+          rarity: string | null
           scientific_name: string | null
           user_id: string | null
         }
@@ -44,6 +45,7 @@ export type Database = {
           in_south_africa?: boolean | null
           interesting_facts?: string[]
           player_id?: string | null
+          rarity?: string | null
           scientific_name?: string | null
           user_id?: string | null
         }
@@ -60,6 +62,7 @@ export type Database = {
           in_south_africa?: boolean | null
           interesting_facts?: string[]
           player_id?: string | null
+          rarity?: string | null
           scientific_name?: string | null
           user_id?: string | null
         }
