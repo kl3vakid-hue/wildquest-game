@@ -193,36 +193,187 @@ export type Database = {
           },
         ]
       }
-      sightings: {
+      sighting_verifications: {
         Row: {
-          animal_id: string
-          animal_name: string
+          ai_confidence: number | null
+          ai_in_south_africa: boolean | null
+          ai_scientific_name: string | null
+          ai_species: string | null
+          captured_at: string | null
+          checks: Json
+          claimed_animal_id: string | null
+          claimed_animal_name: string | null
           created_at: string
-          game_id: string
+          decision: string
+          device_id: string | null
+          flags: string[]
+          game_id: string | null
+          gps_accuracy: number | null
           id: string
-          player_id: string
-          points: number
-          rarity: string
+          image_hash: string | null
+          image_path: string | null
+          latitude: number | null
+          location_plausible: boolean | null
+          longitude: number | null
+          player_id: string | null
+          raw_response: Json | null
+          sighting_id: string | null
+          species_match: boolean | null
+          updated_at: string
         }
         Insert: {
+          ai_confidence?: number | null
+          ai_in_south_africa?: boolean | null
+          ai_scientific_name?: string | null
+          ai_species?: string | null
+          captured_at?: string | null
+          checks?: Json
+          claimed_animal_id?: string | null
+          claimed_animal_name?: string | null
+          created_at?: string
+          decision: string
+          device_id?: string | null
+          flags?: string[]
+          game_id?: string | null
+          gps_accuracy?: number | null
+          id?: string
+          image_hash?: string | null
+          image_path?: string | null
+          latitude?: number | null
+          location_plausible?: boolean | null
+          longitude?: number | null
+          player_id?: string | null
+          raw_response?: Json | null
+          sighting_id?: string | null
+          species_match?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          ai_confidence?: number | null
+          ai_in_south_africa?: boolean | null
+          ai_scientific_name?: string | null
+          ai_species?: string | null
+          captured_at?: string | null
+          checks?: Json
+          claimed_animal_id?: string | null
+          claimed_animal_name?: string | null
+          created_at?: string
+          decision?: string
+          device_id?: string | null
+          flags?: string[]
+          game_id?: string | null
+          gps_accuracy?: number | null
+          id?: string
+          image_hash?: string | null
+          image_path?: string | null
+          latitude?: number | null
+          location_plausible?: boolean | null
+          longitude?: number | null
+          player_id?: string | null
+          raw_response?: Json | null
+          sighting_id?: string | null
+          species_match?: boolean | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sighting_verifications_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sighting_verifications_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sighting_verifications_sighting_id_fkey"
+            columns: ["sighting_id"]
+            isOneToOne: false
+            referencedRelation: "sightings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sightings: {
+        Row: {
+          ai_confidence: number | null
+          ai_species: string | null
+          ai_verdict: string | null
           animal_id: string
           animal_name: string
-          created_at?: string
+          captured_at: string | null
+          created_at: string
+          device_id: string | null
+          flags: string[]
           game_id: string
-          id?: string
+          gps_accuracy: number | null
+          id: string
+          image_hash: string | null
+          image_path: string | null
+          latitude: number | null
+          longitude: number | null
           player_id: string
           points: number
           rarity: string
+          reject_reason: string | null
+          source: string
+          verification_status: string
+          verified_at: string | null
+        }
+        Insert: {
+          ai_confidence?: number | null
+          ai_species?: string | null
+          ai_verdict?: string | null
+          animal_id: string
+          animal_name: string
+          captured_at?: string | null
+          created_at?: string
+          device_id?: string | null
+          flags?: string[]
+          game_id: string
+          gps_accuracy?: number | null
+          id?: string
+          image_hash?: string | null
+          image_path?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          player_id: string
+          points: number
+          rarity: string
+          reject_reason?: string | null
+          source?: string
+          verification_status?: string
+          verified_at?: string | null
         }
         Update: {
+          ai_confidence?: number | null
+          ai_species?: string | null
+          ai_verdict?: string | null
           animal_id?: string
           animal_name?: string
+          captured_at?: string | null
           created_at?: string
+          device_id?: string | null
+          flags?: string[]
           game_id?: string
+          gps_accuracy?: number | null
           id?: string
+          image_hash?: string | null
+          image_path?: string | null
+          latitude?: number | null
+          longitude?: number | null
           player_id?: string
           points?: number
           rarity?: string
+          reject_reason?: string | null
+          source?: string
+          verification_status?: string
+          verified_at?: string | null
         }
         Relationships: [
           {
