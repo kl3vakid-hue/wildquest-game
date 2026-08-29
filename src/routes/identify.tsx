@@ -16,11 +16,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/Button";
 import { ScreenShell } from "@/components/ScreenShell";
 import { ANIMALS } from "@/data/animals";
-import {
-  AI_ANIMAL_POINTS,
-  AI_ANIMAL_RARITY,
-  aiAnimalId,
-} from "@/data/discovered";
+import { AI_ANIMAL_RARITY, aiAnimalId, aiPointsFor } from "@/data/discovered";
 import { useGameSession } from "@/hooks/useGameSession";
 import type { IdentificationResult } from "@/lib/identify.functions";
 import { identifyAnimal } from "@/lib/identify.functions";
@@ -34,6 +30,7 @@ import {
   uploadPhoto,
   type StoredIdentification,
 } from "@/services/identifyService";
+import type { Rarity } from "@/types";
 import { getDeviceId } from "@/utils/session";
 
 
@@ -201,7 +198,7 @@ function Identify() {
     }
   }
 
-  async function handleSpotDiscovery(name: string) {
+  async function handleSpotDiscovery(name: string, rarity: Rarity | null) {
     if (!state.session || !state.me) {
       toast.info("Join or create a game first to earn points.");
       return;
@@ -211,25 +208,26 @@ function Identify() {
       toast.info(`${name} is already in your collection`);
       return;
     }
+    const points = aiPointsFor(rarity);
     const payload = {
       gameId: state.session.gameId,
       playerId: state.session.playerId,
       animalId,
       animalName: name,
-      rarity: AI_ANIMAL_RARITY,
-      points: AI_ANIMAL_POINTS,
+      rarity: rarity ?? AI_ANIMAL_RARITY,
+      points,
     };
 
     if (!state.online) {
       enqueueSighting({ localId: `${animalId}-${Date.now()}`, createdAt: new Date().toISOString(), ...payload });
-      toast.success(`${name} saved offline · +${AI_ANIMAL_POINTS} pts`);
+      toast.success(`${name} saved offline · +${points} pts`);
       state.refresh();
       return;
     }
 
     try {
       await recordSighting(payload);
-      toast.success(`${name} spotted · +${AI_ANIMAL_POINTS} pts`);
+      toast.success(`${name} spotted · +${points} pts`);
       state.refresh();
     } catch {
       enqueueSighting({ localId: `${animalId}-${Date.now()}`, createdAt: new Date().toISOString(), ...payload });
@@ -419,13 +417,15 @@ function Identify() {
 
           {result.animalName ? (
             <Button
-              onClick={() => void handleSpotDiscovery(result.animalName!)}
+              onClick={() => void handleSpotDiscovery(result.animalName!, result.rarity)}
               disabled={state.myAnimalIds.has(aiAnimalId(result.animalName))}
             >
               <PawPrint className="size-5" />
               {state.myAnimalIds.has(aiAnimalId(result.animalName))
                 ? "Already in your collection"
-                : `Spot This Animal · +${AI_ANIMAL_POINTS} pts`}
+                : `Spot This Animal · +${aiPointsFor(result.rarity)} pts${
+                    result.rarity ? ` · ${result.rarity}` : ""
+                  }`}
             </Button>
           ) : null}
 
@@ -457,7 +457,7 @@ function Identify() {
                   </p>
                 </div>
                 <button
-                  onClick={() => void handleSpotDiscovery(row.animal_name)}
+                  onClick={() => void handleSpotDiscovery(row.animal_name, row.rarity)}
                   disabled={state.myAnimalIds.has(aiAnimalId(row.animal_name))}
                   aria-label={`Spot ${row.animal_name}`}
                   className="rounded-xl border border-border p-2 text-primary disabled:opacity-40"

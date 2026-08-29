@@ -10,13 +10,15 @@ interface AnimalCardProps {
   spotted: boolean;
   /** Collection mode shows unspotted animals as dark silhouettes. */
   mode?: "spot" | "collection";
+  /** Overrides the built-in photo, e.g. the user's own AI-identified photo. */
+  photoUrl?: string | undefined;
   onSelect?: (animal: Animal) => void;
 }
 
-export function AnimalCard({ animal, spotted, mode = "spot", onSelect }: AnimalCardProps) {
+export function AnimalCard({ animal, spotted, mode = "spot", photoUrl, onSelect }: AnimalCardProps) {
   const locked = mode === "collection" && !spotted;
   const disabled = mode === "spot" && spotted && !animal.repeatable;
-  const photo = ANIMAL_PHOTOS[animal.id];
+  const photo = photoUrl ?? ANIMAL_PHOTOS[animal.id];
 
   return (
     <motion.button
