@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { countsForScore } from "@/lib/verificationRules";
 import {
   fetchGame,
   fetchGroups,
@@ -9,6 +10,7 @@ import {
   recordSighting,
 } from "@/services/gameService";
 import { queuedForPlayer, readQueue, removeQueued } from "@/services/offlineQueue";
+import { submitQueuedSighting } from "@/services/verificationService";
 import type { Game, Group, LocalSession, Player, Sighting } from "@/types";
 import { loadSession } from "@/utils/session";
 import { useOnlineStatus } from "./useOnlineStatus";
@@ -32,6 +34,8 @@ export interface GameSessionState {
   myGroupMembers: Player[];
   mySightings: Sighting[];
   myAnimalIds: Set<string>;
+  /** Species with an AI-verified sighting — the only ones that score. */
+  verifiedAnimalIds: Set<string>;
   myScore: number;
   leaderboard: Player[];
   groupStandings: GroupStanding[];
@@ -123,15 +127,20 @@ export function useGameSession(): GameSessionState {
     (async () => {
       for (const item of readQueue()) {
         try {
-          await recordSighting({
-            gameId: item.gameId,
-            playerId: item.playerId,
-            animalId: item.animalId,
-            animalName: item.animalName,
-            rarity: item.rarity,
-            points: item.points,
-            createdAt: item.createdAt,
-          });
+          if (item.imageDataUrl && item.imageHash) {
+            // Offline evidence goes through the same verifier as a live capture.
+            await submitQueuedSighting(item);
+          } else {
+            await recordSighting({
+              gameId: item.gameId,
+              playerId: item.playerId,
+              animalId: item.animalId,
+              animalName: item.animalName,
+              rarity: item.rarity,
+              points: item.points,
+              createdAt: item.createdAt,
+            });
+          }
         } catch {
           // Keep it queued unless the row already exists (duplicate claim).
         }
@@ -156,13 +165,18 @@ export function useGameSession(): GameSessionState {
   const derived = useMemo(() => {
     const pendingLocal = gameId && playerId ? queuedForPlayer(gameId, playerId) : [];
     const mySightings = sightings.filter((s) => s.player_id === playerId);
+    const claimable = mySightings.filter((s) => s.verification_status !== "rejected");
     const myAnimalIds = new Set<string>([
-      ...mySightings.map((s) => s.animal_id),
+      ...claimable.map((s) => s.animal_id),
       ...pendingLocal.map((s) => s.animalId),
     ]);
-    const myScore =
-      mySightings.reduce((sum, s) => sum + s.points, 0) +
-      pendingLocal.reduce((sum, s) => sum + s.points, 0);
+    const verifiedAnimalIds = new Set<string>(
+      mySightings.filter((s) => countsForScore(s.verification_status)).map((s) => s.animal_id),
+    );
+    // Only verified sightings score; queued ones are still unverified.
+    const myScore = mySightings
+      .filter((s) => countsForScore(s.verification_status))
+      .reduce((sum, s) => sum + s.points, 0);
 
     const leaderboard = [...players].sort(
       (a, b) => b.score - a.score || a.name.localeCompare(b.name),
@@ -172,7 +186,9 @@ export function useGameSession(): GameSessionState {
       .map((group) => {
         const members = players.filter((p) => p.group_id === group.id);
         const memberIds = new Set(members.map((m) => m.id));
-        const groupSightings = sightings.filter((s) => memberIds.has(s.player_id));
+        const groupSightings = sightings.filter(
+          (s) => memberIds.has(s.player_id) && countsForScore(s.verification_status),
+        );
         return {
           group,
           members,
@@ -182,7 +198,7 @@ export function useGameSession(): GameSessionState {
       })
       .sort((a, b) => b.total - a.total);
 
-    return { mySightings, myAnimalIds, myScore, leaderboard, groupStandings };
+    return { mySightings, myAnimalIds, verifiedAnimalIds, myScore, leaderboard, groupStandings };
   }, [players, groups, sightings, playerId, gameId, pendingCount]);
 
   const myGroup = groups.find((g) => g.id === me?.group_id);
