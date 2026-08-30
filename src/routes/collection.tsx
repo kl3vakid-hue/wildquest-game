@@ -3,9 +3,11 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { AnimalCard } from "@/components/AnimalCard";
 import { ScreenShell } from "@/components/ScreenShell";
+import { StatusBadge, toStatus } from "@/components/StatusBadge";
 import { ANIMALS, RARITY_ORDER, TOTAL_ANIMALS } from "@/data/animals";
 import { AI_ANIMAL_RARITY, isAiAnimalId } from "@/data/discovered";
 import { useGameSession } from "@/hooks/useGameSession";
+import { STATUS_HINT } from "@/lib/verificationRules";
 import { getPhotoUrl, listMyIdentifications } from "@/services/identifyService";
 import type { Animal, Rarity } from "@/types";
 import { formatPoints } from "@/utils/format";
@@ -128,7 +130,7 @@ function Collection() {
       {RARITY_ORDER.map((rarity) => {
         const animals = ANIMALS.filter((animal) => animal.rarity === rarity);
         const extras = discovered.filter((animal) => animal.rarity === rarity);
-        const unlocked = animals.filter((a) => state.myAnimalIds.has(a.id)).length;
+        const unlocked = animals.filter((a) => state.verifiedAnimalIds.has(a.id)).length;
         return (
           <section key={rarity} className="mt-6">
             <div className="mb-2 flex items-baseline justify-between">
@@ -142,7 +144,7 @@ function Collection() {
                 <AnimalCard
                   key={animal.id}
                   animal={animal}
-                  spotted={state.myAnimalIds.has(animal.id)}
+                  spotted={state.verifiedAnimalIds.has(animal.id)}
                   mode="collection"
                 />
               ))}
