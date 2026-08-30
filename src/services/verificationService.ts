@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { verifySighting } from "@/lib/verify.functions";
 import type { VerificationOutcome } from "@/lib/verify.functions";
 import type { VerificationStatus } from "@/lib/verificationRules";
@@ -116,8 +117,8 @@ export async function submitSighting(input: SubmitInput): Promise<SubmitResult> 
     image_path: imagePath,
     decision: outcome.status,
     flags: outcome.flags,
-    checks: outcome.checks as unknown as Record<string, unknown>,
-    raw_response: rawResponse as Record<string, unknown>,
+    checks: outcome.checks as unknown as Json,
+    raw_response: rawResponse as Json,
   });
 
   await syncPlayerScore(input.playerId, input.gameId);
