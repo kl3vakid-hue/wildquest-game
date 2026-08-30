@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { VerificationStatus } from "@/lib/verificationRules";
 import type { Game, Group, Player, Rarity, Sighting } from "@/types";
 import { generateGameCode } from "@/utils/format";
 
@@ -176,7 +177,14 @@ export async function recordSighting(input: {
   rarity: Rarity;
   points: number;
   createdAt?: string;
+  verificationStatus?: VerificationStatus;
+  source?: string;
+  deviceId?: string;
+  aiConfidence?: number | null;
+  aiSpecies?: string | null;
+  imagePath?: string | null;
 }): Promise<void> {
+  const status = input.verificationStatus ?? "verified";
   const { error } = await supabase.from("sightings").insert({
     game_id: input.gameId,
     player_id: input.playerId,
@@ -184,19 +192,27 @@ export async function recordSighting(input: {
     animal_name: input.animalName,
     rarity: input.rarity,
     points: input.points,
+    verification_status: status,
+    source: input.source ?? "camera",
+    device_id: input.deviceId ?? null,
+    ai_confidence: input.aiConfidence ?? null,
+    ai_species: input.aiSpecies ?? null,
+    image_path: input.imagePath ?? null,
+    verified_at: status === "verified" ? new Date().toISOString() : null,
     ...(input.createdAt ? { created_at: input.createdAt } : {}),
   });
   if (error) throw error;
   await syncPlayerScore(input.playerId, input.gameId);
 }
 
-/** Recomputes a player's score from their sightings so scores never drift. */
+/** Recomputes a player's score from VERIFIED sightings only, so scores never drift. */
 export async function syncPlayerScore(playerId: string, gameId: string): Promise<void> {
   const { data, error } = await supabase
     .from("sightings")
     .select("points")
     .eq("game_id", gameId)
-    .eq("player_id", playerId);
+    .eq("player_id", playerId)
+    .eq("verification_status", "verified");
   if (error) throw error;
   const score = (data ?? []).reduce((sum, row) => sum + (row.points ?? 0), 0);
   const { error: updateError } = await supabase

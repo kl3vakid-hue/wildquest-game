@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   CAPTURE_FRESHNESS_MINUTES,
   GPS_ACCURACY_LIMIT,
+  OFFLINE_FRESHNESS_MINUTES,
   decideVerification,
   type VerificationStatus,
   type VerifyChecks,
@@ -19,6 +20,8 @@ const VerifyInput = z.object({
   latitude: z.number().nullable(),
   longitude: z.number().nullable(),
   gpsAccuracy: z.number().nullable(),
+  /** Captured without signal: the freshness window is widened accordingly. */
+  offline: z.boolean().default(false),
 });
 
 export interface VerificationOutcome {
@@ -33,7 +36,8 @@ export interface VerificationOutcome {
   locationPlausible: boolean;
   aiVerdict: string | null;
   checks: VerifyChecks;
-  raw: Record<string, unknown>;
+  /** Raw AI JSON response, kept as text for the audit trail. */
+  raw: string;
 }
 
 const SYSTEM_PROMPT = `You are a strict wildlife sighting verifier for South African game reserves.
@@ -143,7 +147,8 @@ export const verifySighting = createServerFn({ method: "POST" })
       hasGps,
       gpsAccuracy: data.gpsAccuracy,
       accuracyOk: hasGps && (data.gpsAccuracy ?? 0) <= GPS_ACCURACY_LIMIT,
-      timestampFresh: ageMinutes <= CAPTURE_FRESHNESS_MINUTES,
+      timestampFresh:
+        ageMinutes <= (data.offline ? OFFLINE_FRESHNESS_MINUTES : CAPTURE_FRESHNESS_MINUTES),
       locationPlausible,
       duplicatePhoto,
       fromCamera: data.fromCamera,
@@ -163,6 +168,6 @@ export const verifySighting = createServerFn({ method: "POST" })
       locationPlausible,
       aiVerdict: typeof parsed["verdict"] === "string" ? parsed["verdict"] : null,
       checks,
-      raw: parsed,
+      raw,
     };
   });

@@ -1,15 +1,18 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Camera, Search } from "lucide-react";
+import { Camera, Search, ShieldCheck } from "lucide-react";
 
 import { toast } from "sonner";
 import { AnimalCard } from "@/components/AnimalCard";
+import { CaptureSheet, type CaptureSubmission } from "@/components/CaptureSheet";
 import { PointsBurst } from "@/components/PointsBurst";
 import { ScreenShell } from "@/components/ScreenShell";
+import { StatusBadge } from "@/components/StatusBadge";
 import { ANIMALS, RARITY_ORDER } from "@/data/animals";
 import { useGameSession } from "@/hooks/useGameSession";
-import { recordSighting } from "@/services/gameService";
+import { STATUS_HINT, type VerificationStatus } from "@/lib/verificationRules";
 import { enqueueSighting } from "@/services/offlineQueue";
+import { submitSighting } from "@/services/verificationService";
 import type { Animal, Rarity } from "@/types";
 
 export const Route = createFileRoute("/spot")({
@@ -23,12 +26,13 @@ export const Route = createFileRoute("/spot")({
       { title: "Spot an Animal — WildQuest" },
       {
         name: "description",
-        content: "Log a wildlife sighting in seconds. Search 34 South African species and earn points based on rarity.",
+        content:
+          "Log a verified wildlife sighting. Take a live photo, let AI confirm the species, and earn rarity-based points.",
       },
       { property: "og:title", content: "Spot an Animal — WildQuest" },
       {
         property: "og:description",
-        content: "Tap an animal to log your sighting and earn rarity-based points.",
+        content: "Photograph an animal and let AI verify your sighting before points are awarded.",
       },
     ],
   }),
@@ -42,7 +46,11 @@ function Spot() {
   const [query, setQuery] = useState(q ?? "");
   const [rarity, setRarity] = useState<Rarity | "All">("All");
   const [burst, setBurst] = useState<Animal | null>(null);
-
+  const [target, setTarget] = useState<Animal | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [outcome, setOutcome] = useState<
+    { animal: Animal; status: VerificationStatus; reason: string | null; verdict: string | null } | null
+  >(null);
 
   useEffect(() => {
     if (state.ready && !state.session) navigate({ to: "/" });
@@ -58,53 +66,86 @@ function Spot() {
     [query, rarity],
   );
 
-  async function handleSpot(animal: Animal) {
+  function handleSelect(animal: Animal) {
     if (!state.session || !state.me) return;
     if (state.myAnimalIds.has(animal.id)) {
       toast.info(`${animal.name} is already in your collection`);
       return;
     }
+    setOutcome(null);
+    setTarget(animal);
+  }
 
-    setBurst(animal);
-    window.setTimeout(() => setBurst(null), 1600);
-
-    const payload = {
-      gameId: state.session.gameId,
-      playerId: state.session.playerId,
-      animalId: animal.id,
-      animalName: animal.name,
-      rarity: animal.rarity,
-      points: animal.points,
-    };
+  async function handleSubmit({ photo, geo }: CaptureSubmission) {
+    if (!state.session || !target) return;
+    const animal = target;
 
     if (!state.online) {
       enqueueSighting({
         localId: `${animal.id}-${Date.now()}`,
         createdAt: new Date().toISOString(),
-        ...payload,
+        gameId: state.session.gameId,
+        playerId: state.session.playerId,
+        animalId: animal.id,
+        animalName: animal.name,
+        rarity: animal.rarity,
+        points: animal.points,
+        imageDataUrl: photo.dataUrl,
+        imageHash: photo.hash,
+        capturedAt: photo.capturedAt,
+        latitude: geo?.latitude ?? null,
+        longitude: geo?.longitude ?? null,
+        gpsAccuracy: geo?.accuracy ?? null,
+        deviceId: state.session.deviceId,
       });
-      toast.success(`${animal.name} saved offline`);
+      setTarget(null);
+      setOutcome({ animal, status: "pending", reason: null, verdict: null });
+      toast.success(`${animal.name} saved — it will be verified when you have signal`);
       state.refresh();
       return;
     }
 
+    setBusy(true);
     try {
-      await recordSighting(payload);
-      state.refresh();
-    } catch {
-      enqueueSighting({
-        localId: `${animal.id}-${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        ...payload,
+      const result = await submitSighting({
+        gameId: state.session.gameId,
+        playerId: state.session.playerId,
+        deviceId: state.session.deviceId,
+        animalId: animal.id,
+        animalName: animal.name,
+        rarity: animal.rarity,
+        points: animal.points,
+        photo,
+        geo,
       });
-      toast.error("Saved offline — will sync when you have signal");
+      setTarget(null);
+      setOutcome({
+        animal,
+        status: result.status,
+        reason: result.reason,
+        verdict: result.outcome.aiVerdict,
+      });
+      if (result.status === "verified") {
+        setBurst(animal);
+        window.setTimeout(() => setBurst(null), 1600);
+        toast.success(`${animal.name} verified — +${result.pointsAwarded} pts`);
+      } else if (result.status === "rejected") {
+        toast.error(result.reason ?? "That sighting could not be verified");
+      } else {
+        toast.info("Sighting logged — it needs community verification");
+      }
+      state.refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Verification failed. Please try again.");
+    } finally {
+      setBusy(false);
     }
   }
 
   return (
     <ScreenShell
       title="Spot Animal"
-      subtitle={`${state.myAnimalIds.size} species logged`}
+      subtitle={`${state.verifiedAnimalIds.size} verified · ${state.myAnimalIds.size} logged`}
       online={state.online}
       pendingCount={state.pendingCount}
     >
@@ -136,6 +177,29 @@ function Spot() {
         ))}
       </div>
 
+      {outcome ? (
+        <div className="surface mt-4 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-semibold text-foreground">{outcome.animal.name}</p>
+            <StatusBadge status={outcome.status} />
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {outcome.reason ?? STATUS_HINT[outcome.status]}
+          </p>
+          {outcome.verdict ? (
+            <p className="mt-1 text-xs italic text-muted-foreground">AI: {outcome.verdict}</p>
+          ) : null}
+        </div>
+      ) : (
+        <div className="mt-4 flex items-start gap-2 rounded-2xl border border-border bg-secondary/50 p-3">
+          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+          <p className="text-xs text-muted-foreground">
+            Tap a species, then take a live photo. Only AI-verified sightings score points on the
+            leaderboard.
+          </p>
+        </div>
+      )}
+
       <div className="mt-4 grid grid-cols-3 gap-3">
         {visible.map((animal) => (
           <AnimalCard
@@ -143,7 +207,7 @@ function Spot() {
             animal={animal}
             spotted={state.myAnimalIds.has(animal.id)}
             mode="spot"
-            onSelect={handleSpot}
+            onSelect={handleSelect}
           />
         ))}
       </div>
@@ -168,7 +232,15 @@ function Spot() {
           </span>
         </span>
       </Link>
-    </ScreenShell>
 
+      {target ? (
+        <CaptureSheet
+          animal={target}
+          busy={busy}
+          onClose={() => (busy ? null : setTarget(null))}
+          onSubmit={(submission) => void handleSubmit(submission)}
+        />
+      ) : null}
+    </ScreenShell>
   );
 }

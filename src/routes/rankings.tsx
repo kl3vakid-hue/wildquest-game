@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Crown, Users } from "lucide-react";
+import { Crown, ShieldCheck, Users } from "lucide-react";
 import { ScreenShell } from "@/components/ScreenShell";
 import { useGameSession } from "@/hooks/useGameSession";
 import { formatPoints } from "@/utils/format";
@@ -43,6 +43,14 @@ function Rankings() {
       online={state.online}
       pendingCount={state.pendingCount}
     >
+      <div className="mb-3 flex items-start gap-2 rounded-2xl border border-border bg-secondary/50 p-3">
+        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+        <p className="text-xs text-muted-foreground">
+          Leaderboards count AI-verified sightings only. Pending and rejected submissions score
+          nothing.
+        </p>
+      </div>
+
       <div className="flex gap-2 rounded-2xl bg-secondary p-1">
         {(["players", "groups"] as const).map((option) => (
           <button

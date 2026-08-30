@@ -51,6 +51,21 @@ export interface Sighting {
   rarity: Rarity;
   points: number;
   created_at: string;
+  verification_status: string;
+  ai_species: string | null;
+  ai_confidence: number | null;
+  ai_verdict: string | null;
+  image_path: string | null;
+  image_hash: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  gps_accuracy: number | null;
+  captured_at: string | null;
+  device_id: string | null;
+  flags: string[];
+  reject_reason: string | null;
+  verified_at: string | null;
+  source: string;
 }
 
 export interface LocalSession {
@@ -68,4 +83,12 @@ export interface QueuedSighting {
   rarity: Rarity;
   points: number;
   createdAt: string;
+  /** Offline evidence, verified by the AI as soon as signal returns. */
+  imageDataUrl?: string;
+  imageHash?: string;
+  capturedAt?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  gpsAccuracy?: number | null;
+  deviceId?: string;
 }
