@@ -82,12 +82,13 @@ function Collection() {
     return Array.from(byId.values());
   }, [state.mySightings]);
 
-  const found = ANIMALS.filter((a) => state.myAnimalIds.has(a.id)).length;
+  const found = ANIMALS.filter((a) => state.verifiedAnimalIds.has(a.id)).length;
+  const recent = state.mySightings.slice(0, 8);
 
   return (
     <ScreenShell
       title="Collection"
-      subtitle={`${found} of ${TOTAL_ANIMALS} species${
+      subtitle={`${found} of ${TOTAL_ANIMALS} verified${
         discovered.length ? ` · ${discovered.length} AI finds` : ""
       } · ${formatPoints(state.myScore)} pts`}
       online={state.online}
@@ -101,6 +102,28 @@ function Collection() {
           transition={{ duration: 0.6 }}
         />
       </div>
+
+      {recent.length ? (
+        <section className="surface mt-4 divide-y divide-border p-0">
+          <h2 className="display px-4 py-3 text-lg tracking-wide">Sighting status</h2>
+          {recent.map((sighting) => (
+            <div key={sighting.id} className="flex items-center justify-between gap-3 px-4 py-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-foreground">
+                  {sighting.animal_name}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {sighting.verification_status === "verified"
+                    ? `+${sighting.points} pts`
+                    : (sighting.reject_reason ?? STATUS_HINT[toStatus(sighting.verification_status)])}
+                </p>
+              </div>
+              <StatusBadge status={sighting.verification_status} />
+            </div>
+          ))}
+        </section>
+      ) : null}
+
 
       {RARITY_ORDER.map((rarity) => {
         const animals = ANIMALS.filter((animal) => animal.rarity === rarity);
