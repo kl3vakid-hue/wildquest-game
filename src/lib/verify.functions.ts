@@ -33,7 +33,8 @@ export interface VerificationOutcome {
   locationPlausible: boolean;
   aiVerdict: string | null;
   checks: VerifyChecks;
-  raw: Record<string, unknown>;
+  /** Raw AI JSON response, kept as text for the audit trail. */
+  raw: string;
 }
 
 const SYSTEM_PROMPT = `You are a strict wildlife sighting verifier for South African game reserves.
@@ -163,6 +164,6 @@ export const verifySighting = createServerFn({ method: "POST" })
       locationPlausible,
       aiVerdict: typeof parsed["verdict"] === "string" ? parsed["verdict"] : null,
       checks,
-      raw: parsed,
+      raw,
     };
   });
