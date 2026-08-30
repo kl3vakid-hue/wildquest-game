@@ -6,7 +6,7 @@ import type { VerificationStatus } from "@/lib/verificationRules";
 import { syncPlayerScore } from "@/services/gameService";
 import type { CapturedPhoto, GeoFix } from "@/services/capture";
 import { PHOTO_BUCKET } from "@/services/identifyService";
-import type { Rarity } from "@/types";
+import type { QueuedSighting, Rarity } from "@/types";
 
 export interface SubmitInput {
   gameId: string;
@@ -129,4 +129,33 @@ export async function submitSighting(input: SubmitInput): Promise<SubmitResult> 
     outcome,
     pointsAwarded,
   };
+}
+
+/** Verifies a sighting that was captured offline, once signal returns. */
+export async function submitQueuedSighting(item: QueuedSighting): Promise<SubmitResult | null> {
+  if (!item.imageDataUrl || !item.imageHash) return null;
+  const base64 = item.imageDataUrl.split(",")[1] ?? "";
+  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  const blob = new Blob([bytes], { type: "image/jpeg" });
+
+  return submitSighting({
+    gameId: item.gameId,
+    playerId: item.playerId,
+    deviceId: item.deviceId ?? "unknown",
+    animalId: item.animalId,
+    animalName: item.animalName,
+    rarity: item.rarity,
+    points: item.points,
+    photo: {
+      dataUrl: item.imageDataUrl,
+      blob,
+      hash: item.imageHash,
+      capturedAt: item.capturedAt ?? item.createdAt,
+      fromCamera: true,
+    },
+    geo:
+      item.latitude != null && item.longitude != null
+        ? { latitude: item.latitude, longitude: item.longitude, accuracy: item.gpsAccuracy ?? 0 }
+        : null,
+  });
 }
