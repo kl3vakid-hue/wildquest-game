@@ -18,6 +18,7 @@ export interface SubmitInput {
   points: number;
   photo: CapturedPhoto;
   geo: GeoFix | null;
+  offline?: boolean;
 }
 
 export interface SubmitResult {
@@ -53,6 +54,7 @@ export async function submitSighting(input: SubmitInput): Promise<SubmitResult> 
       latitude: input.geo?.latitude ?? null,
       longitude: input.geo?.longitude ?? null,
       gpsAccuracy: input.geo?.accuracy ?? null,
+      offline: input.offline ?? false,
     },
   });
 
@@ -153,6 +155,7 @@ export async function submitQueuedSighting(item: QueuedSighting): Promise<Submit
       capturedAt: item.capturedAt ?? item.createdAt,
       fromCamera: true,
     },
+    offline: true,
     geo:
       item.latitude != null && item.longitude != null
         ? { latitude: item.latitude, longitude: item.longitude, accuracy: item.gpsAccuracy ?? 0 }

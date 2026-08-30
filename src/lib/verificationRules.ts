@@ -13,6 +13,8 @@ export const REVIEW_THRESHOLD = 60;
 export const GPS_ACCURACY_LIMIT = 300;
 /** A photo must have been captured within this many minutes of submission. */
 export const CAPTURE_FRESHNESS_MINUTES = 30;
+/** Offline captures may sit on the device until signal returns. */
+export const OFFLINE_FRESHNESS_MINUTES = 60 * 24;
 
 export const STATUS_LABEL: Record<VerificationStatus, string> = {
   pending: "Pending AI review",
