@@ -83,6 +83,38 @@ export type Database = {
           },
         ]
       }
+      game_settings: {
+        Row: {
+          created_at: string
+          game_id: string
+          id: string
+          rarity_limits: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          id?: string
+          rarity_limits?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          id?: string
+          rarity_limits?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_settings_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: true
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           code: string
