@@ -1,5 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
+import { scoreSightings } from "@/lib/scoringRules";
 import type { VerificationStatus } from "@/lib/verificationRules";
+import { fetchRarityLimits } from "@/services/settingsService";
 import type { Game, Group, Player, Rarity, Sighting } from "@/types";
 import { generateGameCode } from "@/utils/format";
 
@@ -241,7 +243,7 @@ export async function overrideSighting(input: {
       verification_status: input.status,
       reject_reason: input.reason ?? (input.status === "verified" ? null : "Overridden by the host"),
       verified_at: input.status === "verified" ? new Date().toISOString() : null,
-      flags: input.status === "verified" ? [] : undefined,
+      ...(input.status === "verified" ? { flags: [] } : {}),
     })
     .eq("id", input.sightingId);
   if (error) throw error;
