@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CollectionRouteImport } from './routes/collection'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as GameRouteImport } from './routes/game'
@@ -18,6 +19,7 @@ import { Route as IdentifyRouteImport } from './routes/identify'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as LobbyRouteImport } from './routes/lobby'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as RankingsRouteImport } from './routes/rankings'
 import { Route as ResultsRouteImport } from './routes/results'
 import { Route as SpotRouteImport } from './routes/spot'
@@ -25,6 +27,11 @@ import { Route as SpotRouteImport } from './routes/spot'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CollectionRoute = CollectionRouteImport.update({
@@ -67,6 +74,11 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProgressRoute = ProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RankingsRoute = RankingsRouteImport.update({
   id: '/rankings',
   path: '/rankings',
@@ -85,6 +97,7 @@ const SpotRoute = SpotRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/collection': typeof CollectionRoute
   '/create': typeof CreateRoute
   '/game': typeof GameRoute
@@ -93,12 +106,14 @@ export interface FileRoutesByFullPath {
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/profile': typeof ProfileRoute
+  '/progress': typeof ProgressRoute
   '/rankings': typeof RankingsRoute
   '/results': typeof ResultsRoute
   '/spot': typeof SpotRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/collection': typeof CollectionRoute
   '/create': typeof CreateRoute
   '/game': typeof GameRoute
@@ -107,6 +122,7 @@ export interface FileRoutesByTo {
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/profile': typeof ProfileRoute
+  '/progress': typeof ProgressRoute
   '/rankings': typeof RankingsRoute
   '/results': typeof ResultsRoute
   '/spot': typeof SpotRoute
@@ -114,6 +130,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/collection': typeof CollectionRoute
   '/create': typeof CreateRoute
   '/game': typeof GameRoute
@@ -122,6 +139,7 @@ export interface FileRoutesById {
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/profile': typeof ProfileRoute
+  '/progress': typeof ProgressRoute
   '/rankings': typeof RankingsRoute
   '/results': typeof ResultsRoute
   '/spot': typeof SpotRoute
@@ -130,6 +148,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/collection'
     | '/create'
     | '/game'
@@ -138,12 +157,14 @@ export interface FileRouteTypes {
     | '/join'
     | '/lobby'
     | '/profile'
+    | '/progress'
     | '/rankings'
     | '/results'
     | '/spot'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/collection'
     | '/create'
     | '/game'
@@ -152,12 +173,14 @@ export interface FileRouteTypes {
     | '/join'
     | '/lobby'
     | '/profile'
+    | '/progress'
     | '/rankings'
     | '/results'
     | '/spot'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/collection'
     | '/create'
     | '/game'
@@ -166,6 +189,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/lobby'
     | '/profile'
+    | '/progress'
     | '/rankings'
     | '/results'
     | '/spot'
@@ -173,6 +197,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   CollectionRoute: typeof CollectionRoute
   CreateRoute: typeof CreateRoute
   GameRoute: typeof GameRoute
@@ -181,6 +206,7 @@ export interface RootRouteChildren {
   JoinRoute: typeof JoinRoute
   LobbyRoute: typeof LobbyRoute
   ProfileRoute: typeof ProfileRoute
+  ProgressRoute: typeof ProgressRoute
   RankingsRoute: typeof RankingsRoute
   ResultsRoute: typeof ResultsRoute
   SpotRoute: typeof SpotRoute
@@ -193,6 +219,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/collection': {
@@ -251,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/progress': {
+      id: '/progress'
+      path: '/progress'
+      fullPath: '/progress'
+      preLoaderRoute: typeof ProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rankings': {
       id: '/rankings'
       path: '/rankings'
@@ -277,6 +317,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   CollectionRoute: CollectionRoute,
   CreateRoute: CreateRoute,
   GameRoute: GameRoute,
@@ -285,6 +326,7 @@ const rootRouteChildren: RootRouteChildren = {
   JoinRoute: JoinRoute,
   LobbyRoute: LobbyRoute,
   ProfileRoute: ProfileRoute,
+  ProgressRoute: ProgressRoute,
   RankingsRoute: RankingsRoute,
   ResultsRoute: ResultsRoute,
   SpotRoute: SpotRoute,

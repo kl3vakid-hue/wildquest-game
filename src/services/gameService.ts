@@ -1,5 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
+import { scoreSightings } from "@/lib/scoringRules";
 import type { VerificationStatus } from "@/lib/verificationRules";
+import { fetchRarityLimits } from "@/services/settingsService";
 import type { Game, Group, Player, Rarity, Sighting } from "@/types";
 import { generateGameCode } from "@/utils/format";
 
@@ -205,21 +207,55 @@ export async function recordSighting(input: {
   await syncPlayerScore(input.playerId, input.gameId);
 }
 
-/** Recomputes a player's score from VERIFIED sightings only, so scores never drift. */
+/**
+ * Recomputes a player's score from VERIFIED sightings only, applying the
+ * game's per-species rarity limits so scores never drift.
+ */
 export async function syncPlayerScore(playerId: string, gameId: string): Promise<void> {
-  const { data, error } = await supabase
-    .from("sightings")
-    .select("points")
-    .eq("game_id", gameId)
-    .eq("player_id", playerId)
-    .eq("verification_status", "verified");
+  const [{ data, error }, limits] = await Promise.all([
+    supabase
+      .from("sightings")
+      .select("*")
+      .eq("game_id", gameId)
+      .eq("player_id", playerId),
+    fetchRarityLimits(gameId),
+  ]);
   if (error) throw error;
-  const score = (data ?? []).reduce((sum, row) => sum + (row.points ?? 0), 0);
+  const { total } = scoreSightings((data ?? []) as Sighting[], limits);
   const { error: updateError } = await supabase
     .from("players")
-    .update({ score })
+    .update({ score: total })
     .eq("id", playerId);
   if (updateError) throw updateError;
+}
+
+/** Host override of an AI decision from the admin dashboard. */
+export async function overrideSighting(input: {
+  sightingId: string;
+  playerId: string;
+  gameId: string;
+  status: VerificationStatus;
+  reason?: string | null;
+}): Promise<void> {
+  const { error } = await supabase
+    .from("sightings")
+    .update({
+      verification_status: input.status,
+      reject_reason: input.reason ?? (input.status === "verified" ? null : "Overridden by the host"),
+      verified_at: input.status === "verified" ? new Date().toISOString() : null,
+      ...(input.status === "verified" ? { flags: [] } : {}),
+    })
+    .eq("id", input.sightingId);
+  if (error) throw error;
+  await syncPlayerScore(input.playerId, input.gameId);
+}
+
+/** Recomputes every player's score, e.g. after the host changes the limits. */
+export async function resyncAllScores(gameId: string): Promise<void> {
+  const players = await fetchPlayers(gameId);
+  for (const player of players) {
+    await syncPlayerScore(player.id, gameId);
+  }
 }
 
 export async function setReady(playerId: string, ready: boolean): Promise<void> {
