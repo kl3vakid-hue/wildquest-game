@@ -18,6 +18,7 @@ import { Route as IdentifyRouteImport } from './routes/identify'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as LobbyRouteImport } from './routes/lobby'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as RankingsRouteImport } from './routes/rankings'
 import { Route as ResultsRouteImport } from './routes/results'
 import { Route as SpotRouteImport } from './routes/spot'
@@ -67,6 +68,11 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProgressRoute = ProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RankingsRoute = RankingsRouteImport.update({
   id: '/rankings',
   path: '/rankings',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/profile': typeof ProfileRoute
+  '/progress': typeof ProgressRoute
   '/rankings': typeof RankingsRoute
   '/results': typeof ResultsRoute
   '/spot': typeof SpotRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/profile': typeof ProfileRoute
+  '/progress': typeof ProgressRoute
   '/rankings': typeof RankingsRoute
   '/results': typeof ResultsRoute
   '/spot': typeof SpotRoute
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/join': typeof JoinRoute
   '/lobby': typeof LobbyRoute
   '/profile': typeof ProfileRoute
+  '/progress': typeof ProgressRoute
   '/rankings': typeof RankingsRoute
   '/results': typeof ResultsRoute
   '/spot': typeof SpotRoute
@@ -138,6 +147,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/lobby'
     | '/profile'
+    | '/progress'
     | '/rankings'
     | '/results'
     | '/spot'
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/lobby'
     | '/profile'
+    | '/progress'
     | '/rankings'
     | '/results'
     | '/spot'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/join'
     | '/lobby'
     | '/profile'
+    | '/progress'
     | '/rankings'
     | '/results'
     | '/spot'
@@ -181,6 +193,7 @@ export interface RootRouteChildren {
   JoinRoute: typeof JoinRoute
   LobbyRoute: typeof LobbyRoute
   ProfileRoute: typeof ProfileRoute
+  ProgressRoute: typeof ProgressRoute
   RankingsRoute: typeof RankingsRoute
   ResultsRoute: typeof ResultsRoute
   SpotRoute: typeof SpotRoute
@@ -251,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/progress': {
+      id: '/progress'
+      path: '/progress'
+      fullPath: '/progress'
+      preLoaderRoute: typeof ProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rankings': {
       id: '/rankings'
       path: '/rankings'
@@ -285,6 +305,7 @@ const rootRouteChildren: RootRouteChildren = {
   JoinRoute: JoinRoute,
   LobbyRoute: LobbyRoute,
   ProfileRoute: ProfileRoute,
+  ProgressRoute: ProgressRoute,
   RankingsRoute: RankingsRoute,
   ResultsRoute: ResultsRoute,
   SpotRoute: SpotRoute,
