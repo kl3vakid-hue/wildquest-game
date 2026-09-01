@@ -1,7 +1,17 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { achievementProgress, type AchievementProgress } from "@/lib/achievements";
+import { reputationFor, type Reputation } from "@/lib/reputation";
+import {
+  DEFAULT_RARITY_LIMITS,
+  scoreSightings,
+  speciesProgress,
+  type RarityLimits,
+  type SpeciesProgress,
+} from "@/lib/scoringRules";
 import { countsForScore } from "@/lib/verificationRules";
+import { fetchRarityLimits } from "@/services/settingsService";
 import {
   fetchGame,
   fetchGroups,
@@ -37,6 +47,13 @@ export interface GameSessionState {
   /** Species with an AI-verified sighting — the only ones that score. */
   verifiedAnimalIds: Set<string>;
   myScore: number;
+  /** Per-species point limits for this game (host adjustable). */
+  rarityLimits: RarityLimits;
+  speciesProgress: SpeciesProgress[];
+  achievements: AchievementProgress[];
+  reputation: Reputation;
+  /** Sightings the anti-cheat layers flagged — reviewed in the admin dashboard. */
+  flaggedSightings: Sighting[];
   leaderboard: Player[];
   groupStandings: GroupStanding[];
   pendingCount: number;
@@ -76,6 +93,11 @@ export function useGameSession(): GameSessionState {
     queryFn: () => fetchPlayers(gameId!),
     enabled: Boolean(gameId),
   });
+  const settingsQuery = useQuery({
+    queryKey: ["game-settings", gameId],
+    queryFn: () => fetchRarityLimits(gameId!),
+    enabled: Boolean(gameId),
+  });
   const sightingsQuery = useQuery({
     queryKey: ["sightings", gameId],
     queryFn: () => fetchSightings(gameId!),
@@ -104,6 +126,14 @@ export function useGameSession(): GameSessionState {
         "postgres_changes",
         { event: "*", schema: "public", table: "groups", filter: `game_id=eq.${gameId}` },
         () => queryClient.invalidateQueries({ queryKey: ["groups", gameId] }),
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "game_settings", filter: `game_id=eq.${gameId}` },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["game-settings", gameId] });
+          queryClient.invalidateQueries({ queryKey: ["players", gameId] });
+        },
       )
       .on(
         "postgres_changes",
@@ -161,6 +191,7 @@ export function useGameSession(): GameSessionState {
   const groups = groupsQuery.data ?? [];
   const sightings = sightingsQuery.data ?? [];
   const me = players.find((p) => p.id === playerId);
+  const rarityLimits = settingsQuery.data ?? DEFAULT_RARITY_LIMITS;
 
   const derived = useMemo(() => {
     const pendingLocal = gameId && playerId ? queuedForPlayer(gameId, playerId) : [];
@@ -173,10 +204,14 @@ export function useGameSession(): GameSessionState {
     const verifiedAnimalIds = new Set<string>(
       mySightings.filter((s) => countsForScore(s.verification_status)).map((s) => s.animal_id),
     );
-    // Only verified sightings score; queued ones are still unverified.
-    const myScore = mySightings
-      .filter((s) => countsForScore(s.verification_status))
-      .reduce((sum, s) => sum + s.points, 0);
+    // Only verified sightings score, and species limits cap repeat claims.
+    const myScore = scoreSightings(mySightings, rarityLimits).total;
+    const progress = speciesProgress(mySightings, rarityLimits);
+    const achievements = achievementProgress(verifiedAnimalIds);
+    const reputation = reputationFor(mySightings);
+    const flaggedSightings = sightings.filter(
+      (s) => (s.flags ?? []).length > 0 || s.verification_status === "needs_community",
+    );
 
     const leaderboard = [...players].sort(
       (a, b) => b.score - a.score || a.name.localeCompare(b.name),
@@ -198,8 +233,19 @@ export function useGameSession(): GameSessionState {
       })
       .sort((a, b) => b.total - a.total);
 
-    return { mySightings, myAnimalIds, verifiedAnimalIds, myScore, leaderboard, groupStandings };
-  }, [players, groups, sightings, playerId, gameId, pendingCount]);
+    return {
+      mySightings,
+      myAnimalIds,
+      verifiedAnimalIds,
+      myScore,
+      speciesProgress: progress,
+      achievements,
+      reputation,
+      flaggedSightings,
+      leaderboard,
+      groupStandings,
+    };
+  }, [players, groups, sightings, playerId, gameId, pendingCount, rarityLimits]);
 
   const myGroup = groups.find((g) => g.id === me?.group_id);
 
@@ -214,6 +260,7 @@ export function useGameSession(): GameSessionState {
     myGroup,
     myGroupMembers: players.filter((p) => p.group_id === me?.group_id),
     ...derived,
+    rarityLimits,
     pendingCount,
     online,
     isHost: Boolean(me?.is_host),
@@ -222,6 +269,7 @@ export function useGameSession(): GameSessionState {
       queryClient.invalidateQueries({ queryKey: ["sightings", gameId] });
       queryClient.invalidateQueries({ queryKey: ["game", gameId] });
       queryClient.invalidateQueries({ queryKey: ["groups", gameId] });
+      queryClient.invalidateQueries({ queryKey: ["game-settings", gameId] });
     },
   };
 }
