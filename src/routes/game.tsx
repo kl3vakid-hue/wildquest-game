@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { Binoculars, BookMarked, Camera, Flag, Trophy, Users } from "lucide-react";
+import { Award, Binoculars, BookMarked, Camera, Flag, ShieldAlert, Trophy, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/Button";
 import { ScreenShell } from "@/components/ScreenShell";
@@ -90,9 +90,18 @@ function Dashboard() {
         <Button variant="ghost" onClick={() => navigate({ to: "/group" })}>
           <Users className="size-5" /> Group
         </Button>
+        <Button variant="ghost" onClick={() => navigate({ to: "/progress" })}>
+          <Award className="size-5" /> Progress & Achievements
+        </Button>
         <Button variant="ghost" onClick={() => navigate({ to: "/identify" })}>
           <Camera className="size-5" /> Can't find your animal?
         </Button>
+
+        {state.isHost ? (
+          <Button variant="ghost" onClick={() => navigate({ to: "/admin" })}>
+            <ShieldAlert className="size-5" /> Host Dashboard
+          </Button>
+        ) : null}
 
         {state.isHost && state.game ? (
           <Button
