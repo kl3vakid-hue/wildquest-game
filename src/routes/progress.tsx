@@ -4,8 +4,10 @@ import { motion } from "framer-motion";
 import { Award, Gauge, Lock, Target } from "lucide-react";
 
 import { ScreenShell } from "@/components/ScreenShell";
+import { StatusBadge, toStatus } from "@/components/StatusBadge";
 import { RARITY_ORDER } from "@/data/animals";
 import { useGameSession } from "@/hooks/useGameSession";
+import { STATUS_HINT } from "@/lib/verificationRules";
 import { formatPoints } from "@/utils/format";
 
 export const Route = createFileRoute("/progress")({
