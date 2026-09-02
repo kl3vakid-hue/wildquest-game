@@ -83,7 +83,6 @@ function Collection() {
   }, [state.mySightings]);
 
   const found = ANIMALS.filter((a) => state.verifiedAnimalIds.has(a.id)).length;
-  const recent = state.mySightings.slice(0, 8);
 
   return (
     <ScreenShell
