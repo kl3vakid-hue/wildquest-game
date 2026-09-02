@@ -45,10 +45,6 @@ function Admin() {
     if (state.ready && !state.session) navigate({ to: "/" });
   }, [state.ready, state.session, navigate]);
 
-  useEffect(() => {
-    setLimits((current) => current ?? state.rarityLimits);
-  }, [state.rarityLimits]);
-
   if (state.ready && state.session && !state.isHost) {
     return (
       <ScreenShell title="Host Dashboard" online={state.online} pendingCount={state.pendingCount}>
@@ -89,6 +85,7 @@ function Admin() {
     setSaving(true);
     try {
       await saveRarityLimits(state.session.gameId, limits);
+      setLimits(null);
       await resyncAllScores(state.session.gameId);
       toast.success("Scoring limits updated for everyone");
       state.refresh();
