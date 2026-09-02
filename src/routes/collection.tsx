@@ -3,11 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { AnimalCard } from "@/components/AnimalCard";
 import { ScreenShell } from "@/components/ScreenShell";
-import { StatusBadge, toStatus } from "@/components/StatusBadge";
 import { ANIMALS, RARITY_ORDER, TOTAL_ANIMALS } from "@/data/animals";
 import { AI_ANIMAL_RARITY, isAiAnimalId } from "@/data/discovered";
 import { useGameSession } from "@/hooks/useGameSession";
-import { STATUS_HINT } from "@/lib/verificationRules";
 import { getPhotoUrl, listMyIdentifications } from "@/services/identifyService";
 import type { Animal, Rarity } from "@/types";
 import { formatPoints } from "@/utils/format";
@@ -85,7 +83,6 @@ function Collection() {
   }, [state.mySightings]);
 
   const found = ANIMALS.filter((a) => state.verifiedAnimalIds.has(a.id)).length;
-  const recent = state.mySightings.slice(0, 8);
 
   return (
     <ScreenShell
@@ -105,26 +102,6 @@ function Collection() {
         />
       </div>
 
-      {recent.length ? (
-        <section className="surface mt-4 divide-y divide-border p-0">
-          <h2 className="display px-4 py-3 text-lg tracking-wide">Sighting status</h2>
-          {recent.map((sighting) => (
-            <div key={sighting.id} className="flex items-center justify-between gap-3 px-4 py-3">
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-foreground">
-                  {sighting.animal_name}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {sighting.verification_status === "verified"
-                    ? `+${sighting.points} pts`
-                    : (sighting.reject_reason ?? STATUS_HINT[toStatus(sighting.verification_status)])}
-                </p>
-              </div>
-              <StatusBadge status={sighting.verification_status} />
-            </div>
-          ))}
-        </section>
-      ) : null}
 
 
       {RARITY_ORDER.map((rarity) => {
