@@ -56,6 +56,10 @@ export interface GameSessionState {
   rarityLimits: RarityLimits;
   speciesProgress: SpeciesProgress[];
   achievements: AchievementProgress[];
+  /** Raw host-created achievement rows, for the admin dashboard. */
+  customAchievements: CustomAchievementRow[];
+  /** Bonus points this tracker earned from unlocked achievements. */
+  achievementBonus: number;
   reputation: Reputation;
   /** Sightings the anti-cheat layers flagged — reviewed in the admin dashboard. */
   flaggedSightings: Sighting[];
