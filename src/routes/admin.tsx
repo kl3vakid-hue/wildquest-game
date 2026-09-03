@@ -54,6 +54,66 @@ function Admin() {
   const state = useGameSession();
   const [limits, setLimits] = useState<RarityLimits | null>(null);
   const [saving, setSaving] = useState(false);
+  const [draft, setDraft] = useState({
+    name: "",
+    description: "",
+    icon: "🏅",
+    points: 150,
+    rarity: "" as "" | Rarity,
+    species: [] as string[],
+    requiredCount: "" as string,
+  });
+  const [addingAchievement, setAddingAchievement] = useState(false);
+
+  async function addAchievement() {
+    if (!state.session) return;
+    if (!draft.name.trim()) {
+      toast.error("Give the achievement a name");
+      return;
+    }
+    setAddingAchievement(true);
+    try {
+      await createCustomAchievement({
+        gameId: state.session.gameId,
+        name: draft.name.trim(),
+        description: draft.description.trim(),
+        icon: draft.icon.trim() || "🏅",
+        points: Math.max(0, Number(draft.points) || 0),
+        rarity: draft.rarity === "" ? null : draft.rarity,
+        species: draft.species,
+        requiredCount: draft.requiredCount === "" ? null : Math.max(1, Number(draft.requiredCount)),
+      });
+      setDraft({
+        name: "",
+        description: "",
+        icon: "🏅",
+        points: 150,
+        rarity: "",
+        species: [],
+        requiredCount: "",
+      });
+      await resyncAllScores(state.session.gameId);
+      toast.success("Achievement added for everyone");
+      state.refresh();
+    } catch {
+      toast.error("Could not add that achievement");
+    } finally {
+      setAddingAchievement(false);
+    }
+  }
+
+  async function removeAchievement(id: string, name: string) {
+    if (!state.session) return;
+    if (!window.confirm(`Remove the "${name}" achievement?`)) return;
+    try {
+      await deleteCustomAchievement(id);
+      await resyncAllScores(state.session.gameId);
+      toast.success("Achievement removed");
+      state.refresh();
+    } catch {
+      toast.error("Could not remove that achievement");
+    }
+  }
 
   useEffect(() => {
     if (state.ready && !state.session) navigate({ to: "/" });
