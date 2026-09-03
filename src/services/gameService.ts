@@ -1,6 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
+import { achievementBonus } from "@/lib/achievements";
 import { scoreSightings } from "@/lib/scoringRules";
-import type { VerificationStatus } from "@/lib/verificationRules";
+import { countsForScore, type VerificationStatus } from "@/lib/verificationRules";
+import { fetchCustomAchievements, toAchievement } from "@/services/achievementService";
 import { fetchRarityLimits } from "@/services/settingsService";
 import type { Game, Group, Player, Rarity, Sighting } from "@/types";
 import { generateGameCode } from "@/utils/format";
