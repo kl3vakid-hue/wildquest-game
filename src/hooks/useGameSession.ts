@@ -151,6 +151,19 @@ export function useGameSession(): GameSessionState {
       )
       .on(
         "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "game_achievements",
+          filter: `game_id=eq.${gameId}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["game-achievements", gameId] });
+          queryClient.invalidateQueries({ queryKey: ["players", gameId] });
+        },
+      )
+      .on(
+        "postgres_changes",
         { event: "*", schema: "public", table: "games", filter: `id=eq.${gameId}` },
         () => queryClient.invalidateQueries({ queryKey: ["game", gameId] }),
       )
