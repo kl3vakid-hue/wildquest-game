@@ -261,12 +261,23 @@ export function useGameSession(): GameSessionState {
       myScore,
       speciesProgress: progress,
       achievements,
+      customAchievements,
+      achievementBonus: bonus,
       reputation,
       flaggedSightings,
       leaderboard,
       groupStandings,
     };
-  }, [players, groups, sightings, playerId, gameId, pendingCount, rarityLimits]);
+  }, [
+    players,
+    groups,
+    sightings,
+    customAchievements,
+    playerId,
+    gameId,
+    pendingCount,
+    rarityLimits,
+  ]);
 
   const myGroup = groups.find((g) => g.id === me?.group_id);
 
