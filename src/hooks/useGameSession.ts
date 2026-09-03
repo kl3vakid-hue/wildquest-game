@@ -11,6 +11,11 @@ import {
   type SpeciesProgress,
 } from "@/lib/scoringRules";
 import { countsForScore } from "@/lib/verificationRules";
+import {
+  fetchCustomAchievements,
+  toAchievement,
+  type CustomAchievementRow,
+} from "@/services/achievementService";
 import { fetchRarityLimits } from "@/services/settingsService";
 import {
   fetchGame,
