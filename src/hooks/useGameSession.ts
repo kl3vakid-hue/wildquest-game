@@ -222,7 +222,13 @@ export function useGameSession(): GameSessionState {
     // Only verified sightings score, and species limits cap repeat claims.
     const myScore = scoreSightings(mySightings, rarityLimits).total;
     const progress = speciesProgress(mySightings, rarityLimits);
-    const achievements = achievementProgress(verifiedAnimalIds);
+    const achievements = achievementProgress(
+      verifiedAnimalIds,
+      customAchievements.map(toAchievement),
+    );
+    const bonus = achievements
+      .filter((row) => row.unlocked)
+      .reduce((sum, row) => sum + row.achievement.points, 0);
     const reputation = reputationFor(mySightings);
     const flaggedSightings = sightings.filter(
       (s) => (s.flags ?? []).length > 0 || s.verification_status === "needs_community",
