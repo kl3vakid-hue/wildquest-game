@@ -1,14 +1,28 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CheckCircle2, ShieldAlert, Sliders, Trash2, UserMinus, XCircle } from "lucide-react";
+import {
+  Award,
+  CheckCircle2,
+  Plus,
+  ShieldAlert,
+  Sliders,
+  Trash2,
+  UserMinus,
+  XCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/Button";
 import { ScreenShell } from "@/components/ScreenShell";
+import { SightingPhoto } from "@/components/SightingPhoto";
 import { StatusBadge } from "@/components/StatusBadge";
-import { RARITY_ORDER } from "@/data/animals";
+import { ANIMALS, RARITY_ORDER } from "@/data/animals";
 import { useGameSession } from "@/hooks/useGameSession";
 import type { RarityLimits } from "@/lib/scoringRules";
+import {
+  createCustomAchievement,
+  deleteCustomAchievement,
+} from "@/services/achievementService";
 import { overrideSighting, removePlayer, resyncAllScores } from "@/services/gameService";
 import { saveRarityLimits } from "@/services/settingsService";
 import type { Rarity } from "@/types";
