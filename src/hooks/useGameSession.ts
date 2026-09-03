@@ -11,6 +11,11 @@ import {
   type SpeciesProgress,
 } from "@/lib/scoringRules";
 import { countsForScore } from "@/lib/verificationRules";
+import {
+  fetchCustomAchievements,
+  toAchievement,
+  type CustomAchievementRow,
+} from "@/services/achievementService";
 import { fetchRarityLimits } from "@/services/settingsService";
 import {
   fetchGame,
@@ -51,6 +56,10 @@ export interface GameSessionState {
   rarityLimits: RarityLimits;
   speciesProgress: SpeciesProgress[];
   achievements: AchievementProgress[];
+  /** Raw host-created achievement rows, for the admin dashboard. */
+  customAchievements: CustomAchievementRow[];
+  /** Bonus points this tracker earned from unlocked achievements. */
+  achievementBonus: number;
   reputation: Reputation;
   /** Sightings the anti-cheat layers flagged — reviewed in the admin dashboard. */
   flaggedSightings: Sighting[];
@@ -103,6 +112,11 @@ export function useGameSession(): GameSessionState {
     queryFn: () => fetchSightings(gameId!),
     enabled: Boolean(gameId),
   });
+  const achievementsQuery = useQuery({
+    queryKey: ["game-achievements", gameId],
+    queryFn: () => fetchCustomAchievements(gameId!),
+    enabled: Boolean(gameId),
+  });
 
   // Realtime: any change in this game refreshes the affected slice.
   useEffect(() => {
@@ -132,6 +146,19 @@ export function useGameSession(): GameSessionState {
         { event: "*", schema: "public", table: "game_settings", filter: `game_id=eq.${gameId}` },
         () => {
           queryClient.invalidateQueries({ queryKey: ["game-settings", gameId] });
+          queryClient.invalidateQueries({ queryKey: ["players", gameId] });
+        },
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "game_achievements",
+          filter: `game_id=eq.${gameId}`,
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ["game-achievements", gameId] });
           queryClient.invalidateQueries({ queryKey: ["players", gameId] });
         },
       )
@@ -190,6 +217,7 @@ export function useGameSession(): GameSessionState {
   const players = playersQuery.data ?? [];
   const groups = groupsQuery.data ?? [];
   const sightings = sightingsQuery.data ?? [];
+  const customAchievements = achievementsQuery.data ?? [];
   const me = players.find((p) => p.id === playerId);
   const rarityLimits = settingsQuery.data ?? DEFAULT_RARITY_LIMITS;
 
@@ -207,7 +235,13 @@ export function useGameSession(): GameSessionState {
     // Only verified sightings score, and species limits cap repeat claims.
     const myScore = scoreSightings(mySightings, rarityLimits).total;
     const progress = speciesProgress(mySightings, rarityLimits);
-    const achievements = achievementProgress(verifiedAnimalIds);
+    const achievements = achievementProgress(
+      verifiedAnimalIds,
+      customAchievements.map(toAchievement),
+    );
+    const bonus = achievements
+      .filter((row) => row.unlocked)
+      .reduce((sum, row) => sum + row.achievement.points, 0);
     const reputation = reputationFor(mySightings);
     const flaggedSightings = sightings.filter(
       (s) => (s.flags ?? []).length > 0 || s.verification_status === "needs_community",
@@ -240,12 +274,23 @@ export function useGameSession(): GameSessionState {
       myScore,
       speciesProgress: progress,
       achievements,
+      customAchievements,
+      achievementBonus: bonus,
       reputation,
       flaggedSightings,
       leaderboard,
       groupStandings,
     };
-  }, [players, groups, sightings, playerId, gameId, pendingCount, rarityLimits]);
+  }, [
+    players,
+    groups,
+    sightings,
+    customAchievements,
+    playerId,
+    gameId,
+    pendingCount,
+    rarityLimits,
+  ]);
 
   const myGroup = groups.find((g) => g.id === me?.group_id);
 

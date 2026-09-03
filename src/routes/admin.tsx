@@ -1,14 +1,28 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { CheckCircle2, ShieldAlert, Sliders, Trash2, UserMinus, XCircle } from "lucide-react";
+import {
+  Award,
+  CheckCircle2,
+  Plus,
+  ShieldAlert,
+  Sliders,
+  Trash2,
+  UserMinus,
+  XCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/Button";
 import { ScreenShell } from "@/components/ScreenShell";
+import { SightingPhoto } from "@/components/SightingPhoto";
 import { StatusBadge } from "@/components/StatusBadge";
-import { RARITY_ORDER } from "@/data/animals";
+import { ANIMALS, RARITY_ORDER } from "@/data/animals";
 import { useGameSession } from "@/hooks/useGameSession";
 import type { RarityLimits } from "@/lib/scoringRules";
+import {
+  createCustomAchievement,
+  deleteCustomAchievement,
+} from "@/services/achievementService";
 import { overrideSighting, removePlayer, resyncAllScores } from "@/services/gameService";
 import { saveRarityLimits } from "@/services/settingsService";
 import type { Rarity } from "@/types";
@@ -40,6 +54,66 @@ function Admin() {
   const state = useGameSession();
   const [limits, setLimits] = useState<RarityLimits | null>(null);
   const [saving, setSaving] = useState(false);
+  const [draft, setDraft] = useState({
+    name: "",
+    description: "",
+    icon: "🏅",
+    points: 150,
+    rarity: "" as "" | Rarity,
+    species: [] as string[],
+    requiredCount: "" as string,
+  });
+  const [addingAchievement, setAddingAchievement] = useState(false);
+
+  async function addAchievement() {
+    if (!state.session) return;
+    if (!draft.name.trim()) {
+      toast.error("Give the achievement a name");
+      return;
+    }
+    setAddingAchievement(true);
+    try {
+      await createCustomAchievement({
+        gameId: state.session.gameId,
+        name: draft.name.trim(),
+        description: draft.description.trim(),
+        icon: draft.icon.trim() || "🏅",
+        points: Math.max(0, Number(draft.points) || 0),
+        rarity: draft.rarity === "" ? null : draft.rarity,
+        species: draft.species,
+        requiredCount: draft.requiredCount === "" ? null : Math.max(1, Number(draft.requiredCount)),
+      });
+      setDraft({
+        name: "",
+        description: "",
+        icon: "🏅",
+        points: 150,
+        rarity: "",
+        species: [],
+        requiredCount: "",
+      });
+      await resyncAllScores(state.session.gameId);
+      toast.success("Achievement added for everyone");
+      state.refresh();
+    } catch {
+      toast.error("Could not add that achievement");
+    } finally {
+      setAddingAchievement(false);
+    }
+  }
+
+  async function removeAchievement(id: string, name: string) {
+    if (!state.session) return;
+    if (!window.confirm(`Remove the "${name}" achievement?`)) return;
+    try {
+      await deleteCustomAchievement(id);
+      await resyncAllScores(state.session.gameId);
+      toast.success("Achievement removed");
+      state.refresh();
+    } catch {
+      toast.error("Could not remove that achievement");
+    }
+  }
 
   useEffect(() => {
     if (state.ready && !state.session) navigate({ to: "/" });
@@ -122,6 +196,16 @@ function Admin() {
                     </p>
                   </div>
                   <StatusBadge status={sighting.verification_status} />
+                </div>
+
+                <div className="mt-3">
+                  <SightingPhoto
+                    path={sighting.image_path}
+                    alt={`Photo submitted for ${sighting.animal_name}`}
+                  />
+                  <p className="mt-1 text-[10px] text-muted-foreground">
+                    Tap the photo to open it full size.
+                  </p>
                 </div>
 
                 <dl className="mt-3 grid grid-cols-2 gap-2 text-[11px] text-muted-foreground">

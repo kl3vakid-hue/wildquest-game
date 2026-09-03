@@ -1,6 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
+import { achievementBonus } from "@/lib/achievements";
 import { scoreSightings } from "@/lib/scoringRules";
-import type { VerificationStatus } from "@/lib/verificationRules";
+import { countsForScore, type VerificationStatus } from "@/lib/verificationRules";
+import { fetchCustomAchievements, toAchievement } from "@/services/achievementService";
 import { fetchRarityLimits } from "@/services/settingsService";
 import type { Game, Group, Player, Rarity, Sighting } from "@/types";
 import { generateGameCode } from "@/utils/format";
@@ -209,22 +211,28 @@ export async function recordSighting(input: {
 
 /**
  * Recomputes a player's score from VERIFIED sightings only, applying the
- * game's per-species rarity limits so scores never drift.
+ * game's per-species rarity limits, then adds achievement bonus points.
  */
 export async function syncPlayerScore(playerId: string, gameId: string): Promise<void> {
-  const [{ data, error }, limits] = await Promise.all([
+  const [{ data, error }, limits, customRows] = await Promise.all([
     supabase
       .from("sightings")
       .select("*")
       .eq("game_id", gameId)
       .eq("player_id", playerId),
     fetchRarityLimits(gameId),
+    fetchCustomAchievements(gameId).catch(() => []),
   ]);
   if (error) throw error;
-  const { total } = scoreSightings((data ?? []) as Sighting[], limits);
+  const sightings = (data ?? []) as Sighting[];
+  const { total } = scoreSightings(sightings, limits);
+  const verifiedIds = new Set(
+    sightings.filter((s) => countsForScore(s.verification_status)).map((s) => s.animal_id),
+  );
+  const bonus = achievementBonus(verifiedIds, customRows.map(toAchievement));
   const { error: updateError } = await supabase
     .from("players")
-    .update({ score: total })
+    .update({ score: total + bonus })
     .eq("id", playerId);
   if (updateError) throw updateError;
 }
