@@ -22,9 +22,9 @@ export function toAchievement(row: CustomAchievementRow): Achievement {
     description: row.description,
     icon: row.icon || "🏅",
     points: row.points,
-    species: row.species.length ? row.species : undefined,
-    rarity: (row.rarity as Rarity | null) ?? undefined,
-    count: row.required_count ?? undefined,
+    ...(row.species.length ? { species: row.species } : {}),
+    ...(row.rarity ? { rarity: row.rarity as Rarity } : {}),
+    ...(row.required_count != null ? { count: row.required_count } : {}),
     custom: true,
   };
 }
