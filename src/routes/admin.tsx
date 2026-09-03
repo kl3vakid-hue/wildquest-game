@@ -138,6 +138,16 @@ function Admin() {
                   <StatusBadge status={sighting.verification_status} />
                 </div>
 
+                <div className="mt-3">
+                  <SightingPhoto
+                    path={sighting.image_path}
+                    alt={`Photo submitted for ${sighting.animal_name}`}
+                  />
+                  <p className="mt-1 text-[10px] text-muted-foreground">
+                    Tap the photo to open it full size.
+                  </p>
+                </div>
+
                 <dl className="mt-3 grid grid-cols-2 gap-2 text-[11px] text-muted-foreground">
                   <div>
                     <dt className="font-semibold text-foreground">AI species</dt>
