@@ -102,6 +102,12 @@ function Progress() {
         <h2 className="display flex items-center gap-2 text-xl tracking-wide">
           <Award className="size-5 text-primary" /> Achievements
         </h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Unlocked achievements add bonus points to you and your group ·{" "}
+          <span className="font-semibold text-primary">
+            +{state.achievementBonus} bonus pts earned
+          </span>
+        </p>
         <ul className="mt-2 space-y-2">
           {state.achievements.map(({ achievement, have, need, unlocked: done, missing }) => (
             <li
@@ -111,13 +117,24 @@ function Progress() {
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{done ? achievement.icon : "🔒"}</span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-foreground">{achievement.name}</p>
+                  <p className="text-sm font-semibold text-foreground">
+                    {achievement.name}
+                    {achievement.custom ? (
+                      <span className="ml-2 rounded-full border border-border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        host
+                      </span>
+                    ) : null}
+                  </p>
                   <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                  <p className="mt-0.5 text-[11px] font-semibold text-primary">
+                    +{achievement.points} pts
+                  </p>
                 </div>
                 <span className="text-xs font-semibold text-muted-foreground">
                   {Math.min(have, need)}/{need}
                 </span>
               </div>
+
               <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-secondary">
                 <div
                   className="h-full rounded-full bg-primary"
