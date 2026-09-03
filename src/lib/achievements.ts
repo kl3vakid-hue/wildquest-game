@@ -6,14 +6,19 @@ export interface Achievement {
   name: string;
   description: string;
   icon: string;
+  /** Bonus points awarded to the tracker (and their group) on unlock. */
+  points: number;
   /** Species ids required, or null when the goal is a count. */
   species?: string[];
   /** Number of verified species of a rarity required. */
   rarity?: Rarity;
   count?: number;
+  /** True for achievements the host created for this game. */
+  custom?: boolean;
 }
 
 export const ACHIEVEMENTS: Achievement[] = [
+
   {
     id: "big-five",
     name: "The Big Five",
