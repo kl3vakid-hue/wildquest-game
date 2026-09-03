@@ -112,6 +112,11 @@ export function useGameSession(): GameSessionState {
     queryFn: () => fetchSightings(gameId!),
     enabled: Boolean(gameId),
   });
+  const achievementsQuery = useQuery({
+    queryKey: ["game-achievements", gameId],
+    queryFn: () => fetchCustomAchievements(gameId!),
+    enabled: Boolean(gameId),
+  });
 
   // Realtime: any change in this game refreshes the affected slice.
   useEffect(() => {
