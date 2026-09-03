@@ -83,6 +83,56 @@ export type Database = {
           },
         ]
       }
+      game_achievements: {
+        Row: {
+          created_at: string
+          description: string
+          game_id: string
+          icon: string
+          id: string
+          name: string
+          points: number
+          rarity: string | null
+          required_count: number | null
+          species: string[]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          game_id: string
+          icon?: string
+          id?: string
+          name: string
+          points?: number
+          rarity?: string | null
+          required_count?: number | null
+          species?: string[]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          game_id?: string
+          icon?: string
+          id?: string
+          name?: string
+          points?: number
+          rarity?: string | null
+          required_count?: number | null
+          species?: string[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_achievements_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_settings: {
         Row: {
           created_at: string
