@@ -204,6 +204,7 @@ export function useGameSession(): GameSessionState {
   const players = playersQuery.data ?? [];
   const groups = groupsQuery.data ?? [];
   const sightings = sightingsQuery.data ?? [];
+  const customAchievements = achievementsQuery.data ?? [];
   const me = players.find((p) => p.id === playerId);
   const rarityLimits = settingsQuery.data ?? DEFAULT_RARITY_LIMITS;
 
