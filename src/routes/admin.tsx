@@ -315,6 +315,147 @@ function Admin() {
 
       <section className="mt-6">
         <h2 className="display flex items-center gap-2 text-xl tracking-wide">
+          <Award className="size-5 text-primary" /> Achievements
+        </h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Achievements award bonus points to the tracker and their group the moment they unlock.
+        </p>
+
+        <ul className="mt-2 space-y-2">
+          {state.customAchievements.map((row) => (
+            <li key={row.id} className="surface flex items-center gap-3 px-4 py-3">
+              <span className="text-2xl">{row.icon}</span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-foreground">{row.name}</p>
+                <p className="text-xs text-muted-foreground">
+                  +{row.points} pts ·{" "}
+                  {row.species.length
+                    ? `${row.required_count ?? row.species.length} of ${row.species.length} species`
+                    : row.rarity
+                      ? `${row.required_count ?? 1} × ${row.rarity}`
+                      : `${row.required_count ?? 1} species total`}
+                </p>
+              </div>
+              <button
+                aria-label={`Remove ${row.name}`}
+                onClick={() => void removeAchievement(row.id, row.name)}
+                className="grid size-9 place-items-center rounded-xl border border-destructive/40 bg-destructive/10 text-destructive"
+              >
+                <Trash2 className="size-4" />
+              </button>
+            </li>
+          ))}
+        </ul>
+        {state.customAchievements.length === 0 ? (
+          <p className="surface mt-2 p-4 text-center text-sm text-muted-foreground">
+            No custom achievements yet — the seven built-in ones are always active.
+          </p>
+        ) : null}
+
+        <div className="surface mt-3 space-y-3 p-4">
+          <div className="grid grid-cols-[4rem_1fr] gap-2">
+            <input
+              aria-label="Achievement icon"
+              value={draft.icon}
+              maxLength={2}
+              onChange={(e) => setDraft({ ...draft, icon: e.target.value })}
+              className="rounded-xl border border-border bg-input px-3 py-2 text-center text-lg focus:border-primary focus:outline-none"
+            />
+            <input
+              aria-label="Achievement name"
+              placeholder="Achievement name"
+              value={draft.name}
+              onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+              className="rounded-xl border border-border bg-input px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+            />
+          </div>
+          <input
+            aria-label="Achievement description"
+            placeholder="What must trackers do?"
+            value={draft.description}
+            onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+            className="w-full rounded-xl border border-border bg-input px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+          />
+          <div className="grid grid-cols-2 gap-2">
+            <label className="text-xs font-semibold text-muted-foreground">
+              Bonus points
+              <input
+                type="number"
+                min={0}
+                inputMode="numeric"
+                value={draft.points}
+                onChange={(e) => setDraft({ ...draft, points: Number(e.target.value) })}
+                className="mt-1 w-full rounded-xl border border-border bg-input px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+              />
+            </label>
+            <label className="text-xs font-semibold text-muted-foreground">
+              Species needed
+              <input
+                type="number"
+                min={1}
+                inputMode="numeric"
+                placeholder="all selected"
+                value={draft.requiredCount}
+                onChange={(e) => setDraft({ ...draft, requiredCount: e.target.value })}
+                className="mt-1 w-full rounded-xl border border-border bg-input px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+              />
+            </label>
+          </div>
+          <label className="block text-xs font-semibold text-muted-foreground">
+            Rarity goal (optional)
+            <select
+              value={draft.rarity}
+              onChange={(e) => setDraft({ ...draft, rarity: e.target.value as "" | Rarity })}
+              className="mt-1 w-full rounded-xl border border-border bg-input px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+            >
+              <option value="">No rarity requirement</option>
+              {RARITY_ORDER.map((rarity: Rarity) => (
+                <option key={rarity} value={rarity}>
+                  {rarity}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div>
+            <p className="text-xs font-semibold text-muted-foreground">
+              Specific species (optional)
+            </p>
+            <div className="mt-2 flex max-h-40 flex-wrap gap-1.5 overflow-y-auto">
+              {ANIMALS.map((animal) => {
+                const picked = draft.species.includes(animal.id);
+                return (
+                  <button
+                    key={animal.id}
+                    type="button"
+                    onClick={() =>
+                      setDraft({
+                        ...draft,
+                        species: picked
+                          ? draft.species.filter((id) => id !== animal.id)
+                          : [...draft.species, animal.id],
+                      })
+                    }
+                    className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+                      picked
+                        ? "border-primary bg-primary/15 text-primary"
+                        : "border-border bg-secondary text-muted-foreground"
+                    }`}
+                  >
+                    {animal.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <Button onClick={() => void addAchievement()} disabled={addingAchievement}>
+            <Plus className="size-4" /> {addingAchievement ? "Adding…" : "Add achievement"}
+          </Button>
+        </div>
+      </section>
+
+
+      <section className="mt-6">
+        <h2 className="display flex items-center gap-2 text-xl tracking-wide">
           <UserMinus className="size-5 text-primary" /> Trackers
         </h2>
         <ul className="mt-2 space-y-2">
