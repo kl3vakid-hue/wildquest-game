@@ -24,7 +24,7 @@ export const Route = createFileRoute("/collection")({
       { property: "og:title", content: "My Collection — WildQuest" },
       {
         property: "og:description",
-        content: "Unlock all 34 species and complete your safari checklist.",
+        content: "Unlock every Kruger mammal, bird and reptile to complete your safari checklist.",
       },
     ],
   }),

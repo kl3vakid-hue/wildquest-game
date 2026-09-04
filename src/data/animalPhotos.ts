@@ -34,6 +34,20 @@ import white_rhinoPhoto from "@/assets/animals/white-rhino.jpg.asset.json";
 import wild_dogPhoto from "@/assets/animals/wild-dog.jpg.asset.json";
 import wildebeestPhoto from "@/assets/animals/wildebeest.jpg.asset.json";
 import zebraPhoto from "@/assets/animals/zebra.jpg.asset.json";
+import lilac_breasted_rollerPhoto from "@/assets/animals/lilac-breasted-roller.jpg";
+import fish_eaglePhoto from "@/assets/animals/fish-eagle.jpg";
+import ground_hornbillPhoto from "@/assets/animals/ground-hornbill.jpg";
+import saddle_billed_storkPhoto from "@/assets/animals/saddle-billed-stork.jpg";
+import kori_bustardPhoto from "@/assets/animals/kori-bustard.jpg";
+import guineafowlPhoto from "@/assets/animals/guineafowl.jpg";
+import marabouPhoto from "@/assets/animals/marabou.jpg";
+import fishing_owlPhoto from "@/assets/animals/fishing-owl.jpg";
+import leopard_tortoisePhoto from "@/assets/animals/leopard-tortoise.jpg";
+import nile_monitorPhoto from "@/assets/animals/nile-monitor.jpg";
+import rock_pythonPhoto from "@/assets/animals/rock-python.jpg";
+import black_mambaPhoto from "@/assets/animals/black-mamba.jpg";
+import puff_adderPhoto from "@/assets/animals/puff-adder.jpg";
+import chameleonPhoto from "@/assets/animals/chameleon.jpg";
 
 export const ANIMAL_PHOTOS: Record<string, string> = {
   "aardvark": aardvarkPhoto.url,
@@ -71,4 +85,18 @@ export const ANIMAL_PHOTOS: Record<string, string> = {
   "wild-dog": wild_dogPhoto.url,
   "wildebeest": wildebeestPhoto.url,
   "zebra": zebraPhoto.url,
+  "lilac-breasted-roller": lilac_breasted_rollerPhoto,
+  "fish-eagle": fish_eaglePhoto,
+  "ground-hornbill": ground_hornbillPhoto,
+  "saddle-billed-stork": saddle_billed_storkPhoto,
+  "kori-bustard": kori_bustardPhoto,
+  "guineafowl": guineafowlPhoto,
+  "marabou": marabouPhoto,
+  "fishing-owl": fishing_owlPhoto,
+  "leopard-tortoise": leopard_tortoisePhoto,
+  "nile-monitor": nile_monitorPhoto,
+  "rock-python": rock_pythonPhoto,
+  "black-mamba": black_mambaPhoto,
+  "puff-adder": puff_adderPhoto,
+  "chameleon": chameleonPhoto,
 };
