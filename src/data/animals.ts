@@ -41,6 +41,20 @@ export const ANIMALS: Animal[] = [
   { id: "vervet", name: "Vervet Monkey", points: 18, rarity: "Common", image: "🐵" },
   { id: "warthog", name: "Warthog", points: 15, rarity: "Common", image: "🐗" },
   { id: "impala", name: "Impala", points: 10, rarity: "Common", image: "🦌", repeatable: false },
+  { id: "fishing-owl", name: "Pel's Fishing Owl", points: 140, rarity: "Very Rare", image: "🦉" },
+  { id: "black-mamba", name: "Black Mamba", points: 130, rarity: "Very Rare", image: "🐍" },
+  { id: "rock-python", name: "African Rock Python", points: 95, rarity: "Rare", image: "🐍" },
+  { id: "chameleon", name: "Flap-necked Chameleon", points: 85, rarity: "Rare", image: "🦎" },
+  { id: "ground-hornbill", name: "Southern Ground Hornbill", points: 80, rarity: "Rare", image: "🐦" },
+  { id: "saddle-billed-stork", name: "Saddle-billed Stork", points: 75, rarity: "Rare", image: "🦩" },
+  { id: "puff-adder", name: "Puff Adder", points: 70, rarity: "Rare", image: "🐍" },
+  { id: "kori-bustard", name: "Kori Bustard", points: 60, rarity: "Uncommon", image: "🐦" },
+  { id: "nile-monitor", name: "Nile Monitor", points: 55, rarity: "Uncommon", image: "🦎" },
+  { id: "fish-eagle", name: "African Fish Eagle", points: 50, rarity: "Uncommon", image: "🦅" },
+  { id: "marabou", name: "Marabou Stork", points: 45, rarity: "Uncommon", image: "🐦" },
+  { id: "leopard-tortoise", name: "Leopard Tortoise", points: 30, rarity: "Common", image: "🐢" },
+  { id: "lilac-breasted-roller", name: "Lilac-breasted Roller", points: 25, rarity: "Common", image: "🐦" },
+  { id: "guineafowl", name: "Helmeted Guineafowl", points: 15, rarity: "Common", image: "🐔" },
 ];
 
 export const TOTAL_ANIMALS = ANIMALS.length;
