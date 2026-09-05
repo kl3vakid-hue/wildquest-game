@@ -8,6 +8,8 @@ interface ScreenShellProps {
   children: ReactNode;
   online?: boolean;
   pendingCount?: number;
+  /** ISO time of the last successful sync, shown while offline. */
+  lastSynced?: string | null;
   action?: ReactNode;
 }
 
@@ -17,6 +19,7 @@ export function ScreenShell({
   children,
   online = true,
   pendingCount = 0,
+  lastSynced,
   action,
 }: ScreenShellProps) {
   return (
@@ -33,13 +36,23 @@ export function ScreenShell({
         </header>
 
         {!online || pendingCount > 0 ? (
-          <div className="mb-4 flex items-center gap-2 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-xs text-primary">
-            <WifiOff className="size-4" />
-            {online
-              ? `Syncing ${pendingCount} offline sighting${pendingCount === 1 ? "" : "s"}…`
-              : `Offline — sightings are saved on your phone${
-                  pendingCount ? ` (${pendingCount} waiting)` : ""
-                }`}
+          <div className="mb-4 flex items-start gap-2 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-xs text-primary">
+            <WifiOff className="mt-0.5 size-4 shrink-0" />
+            <span>
+              {online
+                ? `Syncing ${pendingCount} offline sighting${pendingCount === 1 ? "" : "s"}…`
+                : `Offline — everything you do is saved on your phone${
+                    pendingCount ? ` (${pendingCount} waiting)` : ""
+                  }.`}
+              {!online && lastSynced ? (
+                <span className="block text-primary/80">
+                  Scores last updated {new Date(lastSynced).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              ) : null}
+            </span>
           </div>
         ) : null}
 
@@ -49,3 +62,4 @@ export function ScreenShell({
     </div>
   );
 }
+
