@@ -46,6 +46,7 @@ function GroupScreen() {
       subtitle={`${state.myGroupMembers.length} members · ${formatPoints(groupTotal)} pts`}
       online={state.online}
       pendingCount={state.pendingCount}
+      lastSynced={state.lastSynced}
     >
       <div className="surface flex items-center justify-between p-4">
         <div>

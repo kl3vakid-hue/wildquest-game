@@ -42,6 +42,7 @@ function Rankings() {
       subtitle={state.game?.name ?? ""}
       online={state.online}
       pendingCount={state.pendingCount}
+      lastSynced={state.lastSynced}
     >
       <div className="mb-3 flex items-start gap-2 rounded-2xl border border-border bg-secondary/50 p-3">
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />

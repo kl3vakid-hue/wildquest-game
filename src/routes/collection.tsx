@@ -92,6 +92,7 @@ function Collection() {
       } · ${formatPoints(state.myScore)} pts`}
       online={state.online}
       pendingCount={state.pendingCount}
+      lastSynced={state.lastSynced}
     >
       <div className="h-2 overflow-hidden rounded-full bg-secondary">
         <motion.div

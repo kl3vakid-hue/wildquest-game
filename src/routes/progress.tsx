@@ -49,6 +49,7 @@ function Progress() {
       subtitle={`${unlocked}/${state.achievements.length} achievements · ${formatPoints(state.myScore)} pts`}
       online={state.online}
       pendingCount={state.pendingCount}
+      lastSynced={state.lastSynced}
     >
       <section className="surface p-4">
         <div className="flex items-center gap-3">

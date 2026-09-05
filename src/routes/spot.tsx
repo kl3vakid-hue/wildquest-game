@@ -148,6 +148,7 @@ function Spot() {
       subtitle={`${state.verifiedAnimalIds.size} verified · ${state.myAnimalIds.size} logged`}
       online={state.online}
       pendingCount={state.pendingCount}
+      lastSynced={state.lastSynced}
     >
       <PointsBurst animal={burst} />
 

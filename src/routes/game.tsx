@@ -50,6 +50,7 @@ function Dashboard() {
       subtitle={`${state.myGroup?.name ?? "No group"} · Code ${state.game?.code ?? "—"}`}
       online={state.online}
       pendingCount={state.pendingCount}
+      lastSynced={state.lastSynced}
     >
       <motion.section
         initial={{ opacity: 0, scale: 0.96 }}

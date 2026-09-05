@@ -265,6 +265,7 @@ function Identify() {
       subtitle="Photograph an animal that isn't on the Spot list"
       online={state.online}
       pendingCount={state.pendingCount}
+      lastSynced={state.lastSynced}
     >
       <input
         ref={cameraRef}
