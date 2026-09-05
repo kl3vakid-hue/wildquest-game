@@ -408,7 +408,11 @@ function Identify() {
 
         <Button onClick={() => void handleIdentify()} disabled={!preview || loading}>
           {loading ? <Loader2 className="size-5 animate-spin" /> : <Sparkles className="size-5" />}
-          {loading ? "Analyzing your animal…" : "Identify Animal"}
+          {loading
+            ? "Analyzing your animal…"
+            : state.online
+              ? "Identify Animal"
+              : "Save Photo — Identify Later"}
         </Button>
       </div>
 
@@ -417,6 +421,24 @@ function Identify() {
           Analyzing your animal… this usually takes a few seconds.
         </p>
       ) : null}
+
+      {!state.online ? (
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          No signal — your photo is kept on your phone and identified automatically the moment
+          you&apos;re back in range.
+        </p>
+      ) : null}
+
+      {pendingIdentifications > 0 ? (
+        <p className="mt-3 flex items-center justify-center gap-2 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-xs text-primary">
+          {syncing ? <Loader2 className="size-4 animate-spin" /> : <Camera className="size-4" />}
+          {syncing
+            ? `Identifying ${pendingIdentifications} saved photo${pendingIdentifications === 1 ? "" : "s"}…`
+            : `${pendingIdentifications} photo${pendingIdentifications === 1 ? "" : "s"} waiting to be identified`}
+        </p>
+      ) : null}
+
+
 
       {result?.status === "low_confidence" ? (
         <div className="surface mt-5 space-y-3 p-5">
