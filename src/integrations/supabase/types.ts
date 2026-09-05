@@ -479,7 +479,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_host_view_photo: { Args: { _path: string }; Returns: boolean }
+      current_device_id: { Args: never; Returns: string }
+      game_is_unclaimed: { Args: { _game_id: string }; Returns: boolean }
+      is_game_host: { Args: { _game_id: string }; Returns: boolean }
+      is_game_member: { Args: { _game_id: string }; Returns: boolean }
+      owns_player: { Args: { _player_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
