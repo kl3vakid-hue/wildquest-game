@@ -134,6 +134,13 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  // Makes the published app installable and openable without signal.
+  useEffect(() => {
+    setupOfflineSupport();
+  }, []);
+
+
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
