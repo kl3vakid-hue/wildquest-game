@@ -22,6 +22,9 @@ export default defineConfig({
         injectRegister: null,
         devOptions: { enabled: false },
         filename: "sw.js",
+        // Client build output, so the worker is served from the site root.
+        outDir: "dist/client",
+
         // Manifest is served statically from public/manifest.webmanifest.
         manifest: false,
         workbox: {
