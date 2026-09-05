@@ -88,43 +88,45 @@ export function useGameSession(): GameSessionState {
   const playerId = session?.playerId;
 
   // Polling keeps everyone in sync even when the live connection drops
-  // (mobile data, background tabs, reserve dead zones).
+  // (mobile data, background tabs, reserve dead zones). Every read falls back
+  // to the copy stored on the device, so screens still work with no signal.
   const gameQuery = useQuery({
     queryKey: ["game", gameId],
-    queryFn: () => fetchGame(gameId!),
+    queryFn: () => cached(`game.${gameId}`, () => fetchGame(gameId!)),
     enabled: Boolean(gameId),
     refetchInterval: 3000,
     refetchOnWindowFocus: true,
   });
   const groupsQuery = useQuery({
     queryKey: ["groups", gameId],
-    queryFn: () => fetchGroups(gameId!),
+    queryFn: () => cached(`groups.${gameId}`, () => fetchGroups(gameId!)),
     enabled: Boolean(gameId),
     refetchInterval: 10000,
   });
   const playersQuery = useQuery({
     queryKey: ["players", gameId],
-    queryFn: () => fetchPlayers(gameId!),
+    queryFn: () => cached(`players.${gameId}`, () => fetchPlayers(gameId!)),
     enabled: Boolean(gameId),
     refetchInterval: 3000,
     refetchOnWindowFocus: true,
   });
   const settingsQuery = useQuery({
     queryKey: ["game-settings", gameId],
-    queryFn: () => fetchRarityLimits(gameId!),
+    queryFn: () => cached(`settings.${gameId}`, () => fetchRarityLimits(gameId!)),
     enabled: Boolean(gameId),
   });
   const sightingsQuery = useQuery({
     queryKey: ["sightings", gameId],
-    queryFn: () => fetchSightings(gameId!),
+    queryFn: () => cached(`sightings.${gameId}`, () => fetchSightings(gameId!)),
     enabled: Boolean(gameId),
     refetchInterval: 8000,
   });
   const achievementsQuery = useQuery({
     queryKey: ["game-achievements", gameId],
-    queryFn: () => fetchCustomAchievements(gameId!),
+    queryFn: () => cached(`achievements.${gameId}`, () => fetchCustomAchievements(gameId!)),
     enabled: Boolean(gameId),
   });
+
 
 
   // Realtime: any change in this game refreshes the affected slice.
