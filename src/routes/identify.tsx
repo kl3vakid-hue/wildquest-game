@@ -21,7 +21,15 @@ import { useGameSession } from "@/hooks/useGameSession";
 import type { IdentificationResult } from "@/lib/identify.functions";
 import { identifyAnimal } from "@/lib/identify.functions";
 import { recordSighting } from "@/services/gameService";
+import { cached } from "@/services/offlineCache";
 import { enqueueSighting } from "@/services/offlineQueue";
+
+import {
+  enqueueIdentification,
+  flushIdentifyQueue,
+  readIdentifyQueue,
+} from "@/services/identifyQueue";
+
 import {
   deleteIdentification,
   getPhotoUrl,
@@ -104,13 +112,19 @@ function Identify() {
   const [savePhoto, setSavePhoto] = useState(true);
   const [history, setHistory] = useState<StoredIdentification[]>([]);
   const [historyUrls, setHistoryUrls] = useState<Record<string, string>>({});
+  const [pendingIdentifications, setPendingIdentifications] = useState(0);
+  const [syncing, setSyncing] = useState(false);
+
 
   const deviceId = typeof window === "undefined" ? "server" : getDeviceId();
 
   async function refreshHistory() {
     try {
-      const rows = await listMyIdentifications(deviceId);
+      const rows = await cached(`identifications.${deviceId}`, () =>
+        listMyIdentifications(deviceId),
+      );
       setHistory(rows);
+
       const urls: Record<string, string> = {};
       await Promise.all(
         rows.map(async (row) => {
@@ -129,6 +143,41 @@ function Identify() {
     void refreshHistory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Photos taken with no signal are identified automatically once it returns.
+  useEffect(() => {
+    setPendingIdentifications(readIdentifyQueue().length);
+    if (!state.online) return;
+    let cancelled = false;
+    (async () => {
+      const queued = readIdentifyQueue();
+      if (!queued.length) return;
+      setSyncing(true);
+      try {
+        const outcomes = await flushIdentifyQueue();
+        if (cancelled) return;
+        for (const outcome of outcomes) {
+          if (outcome.knownAnimalName) {
+            toast.success(`${outcome.knownAnimalName} is already in our Spot an Animal list!`);
+          } else if (outcome.result.status === "identified" && outcome.result.animalName) {
+            toast.success(`Identified from your offline photo: ${outcome.result.animalName}`);
+          } else {
+            toast.info("One offline photo could not be identified with enough confidence.");
+          }
+        }
+        void refreshHistory();
+      } finally {
+        if (!cancelled) {
+          setSyncing(false);
+          setPendingIdentifications(readIdentifyQueue().length);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.online]);
 
   async function handleFile(file: File | undefined) {
     if (!file) return;
@@ -153,8 +202,32 @@ function Identify() {
     if (uploadRef.current) uploadRef.current.value = "";
   }
 
+  function queueForLater(dataUrl: string, message: string) {
+    enqueueIdentification({
+      localId: `id-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      imageDataUrl: dataUrl,
+      createdAt: new Date().toISOString(),
+      savePhoto,
+      deviceId,
+      gameId: state.session?.gameId ?? null,
+      playerId: state.session?.playerId ?? null,
+    });
+    setPendingIdentifications(readIdentifyQueue().length);
+    clearPhoto();
+    toast.success(message);
+  }
+
   async function handleIdentify() {
     if (!preview) return;
+
+    if (!state.online) {
+      queueForLater(
+        preview.dataUrl,
+        "Photo saved — we'll identify it as soon as you have signal.",
+      );
+      return;
+    }
+
     setLoading(true);
     setResult(null);
     setKnown(undefined);
@@ -195,13 +268,19 @@ function Identify() {
         toast.error("Identification saved on screen only — the database was unavailable.");
       }
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Identification failed. Please try again.",
-      );
+      const dataUrl = preview.dataUrl;
+      if (!navigator.onLine) {
+        queueForLater(dataUrl, "Signal dropped — the photo is saved and will be identified later.");
+      } else {
+        toast.error(
+          error instanceof Error ? error.message : "Identification failed. Please try again.",
+        );
+      }
     } finally {
       setLoading(false);
     }
   }
+
 
   async function handleSpotDiscovery(name: string, rarity: Rarity | null) {
     if (!state.session || !state.me) {
@@ -265,6 +344,7 @@ function Identify() {
       subtitle="Photograph an animal that isn't on the Spot list"
       online={state.online}
       pendingCount={state.pendingCount}
+      lastSynced={state.lastSynced}
     >
       <input
         ref={cameraRef}
@@ -333,7 +413,11 @@ function Identify() {
 
         <Button onClick={() => void handleIdentify()} disabled={!preview || loading}>
           {loading ? <Loader2 className="size-5 animate-spin" /> : <Sparkles className="size-5" />}
-          {loading ? "Analyzing your animal…" : "Identify Animal"}
+          {loading
+            ? "Analyzing your animal…"
+            : state.online
+              ? "Identify Animal"
+              : "Save Photo — Identify Later"}
         </Button>
       </div>
 
@@ -342,6 +426,24 @@ function Identify() {
           Analyzing your animal… this usually takes a few seconds.
         </p>
       ) : null}
+
+      {!state.online ? (
+        <p className="mt-3 text-center text-xs text-muted-foreground">
+          No signal — your photo is kept on your phone and identified automatically the moment
+          you&apos;re back in range.
+        </p>
+      ) : null}
+
+      {pendingIdentifications > 0 ? (
+        <p className="mt-3 flex items-center justify-center gap-2 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-xs text-primary">
+          {syncing ? <Loader2 className="size-4 animate-spin" /> : <Camera className="size-4" />}
+          {syncing
+            ? `Identifying ${pendingIdentifications} saved photo${pendingIdentifications === 1 ? "" : "s"}…`
+            : `${pendingIdentifications} photo${pendingIdentifications === 1 ? "" : "s"} waiting to be identified`}
+        </p>
+      ) : null}
+
+
 
       {result?.status === "low_confidence" ? (
         <div className="surface mt-5 space-y-3 p-5">

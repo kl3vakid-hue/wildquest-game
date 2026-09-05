@@ -176,6 +176,7 @@ function Admin() {
       subtitle={`${state.flaggedSightings.length} to review · ${state.players.length} trackers`}
       online={state.online}
       pendingCount={state.pendingCount}
+      lastSynced={state.lastSynced}
     >
       <section>
         <h2 className="display flex items-center gap-2 text-xl tracking-wide">
