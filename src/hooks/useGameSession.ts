@@ -25,6 +25,8 @@ import {
   recordSighting,
 } from "@/services/gameService";
 import { queuedForPlayer, readQueue, removeQueued } from "@/services/offlineQueue";
+import { cached, lastSyncedAt } from "@/services/offlineCache";
+
 import { submitQueuedSighting } from "@/services/verificationService";
 import type { Game, Group, LocalSession, Player, Sighting } from "@/types";
 import { loadSession } from "@/utils/session";
