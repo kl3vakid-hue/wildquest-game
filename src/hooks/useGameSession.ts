@@ -324,6 +324,8 @@ export function useGameSession(): GameSessionState {
     rarityLimits,
     pendingCount,
     online,
+    lastSynced: lastSyncedAt(),
+
     isHost: Boolean(me?.is_host),
     refresh: () => {
       queryClient.invalidateQueries({ queryKey: ["players", gameId] });
