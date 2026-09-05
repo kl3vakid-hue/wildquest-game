@@ -87,20 +87,27 @@ export function useGameSession(): GameSessionState {
   const gameId = session?.gameId;
   const playerId = session?.playerId;
 
+  // Polling keeps everyone in sync even when the live connection drops
+  // (mobile data, background tabs, reserve dead zones).
   const gameQuery = useQuery({
     queryKey: ["game", gameId],
     queryFn: () => fetchGame(gameId!),
     enabled: Boolean(gameId),
+    refetchInterval: 3000,
+    refetchOnWindowFocus: true,
   });
   const groupsQuery = useQuery({
     queryKey: ["groups", gameId],
     queryFn: () => fetchGroups(gameId!),
     enabled: Boolean(gameId),
+    refetchInterval: 10000,
   });
   const playersQuery = useQuery({
     queryKey: ["players", gameId],
     queryFn: () => fetchPlayers(gameId!),
     enabled: Boolean(gameId),
+    refetchInterval: 3000,
+    refetchOnWindowFocus: true,
   });
   const settingsQuery = useQuery({
     queryKey: ["game-settings", gameId],
@@ -111,12 +118,14 @@ export function useGameSession(): GameSessionState {
     queryKey: ["sightings", gameId],
     queryFn: () => fetchSightings(gameId!),
     enabled: Boolean(gameId),
+    refetchInterval: 8000,
   });
   const achievementsQuery = useQuery({
     queryKey: ["game-achievements", gameId],
     queryFn: () => fetchCustomAchievements(gameId!),
     enabled: Boolean(gameId),
   });
+
 
   // Realtime: any change in this game refreshes the affected slice.
   useEffect(() => {
