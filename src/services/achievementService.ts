@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db as supabase } from "@/lib/db";
 import type { Achievement } from "@/lib/achievements";
 import type { Rarity } from "@/types";
 

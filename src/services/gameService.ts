@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db as supabase } from "@/lib/db";
 import { achievementBonus } from "@/lib/achievements";
 import { scoreSightings } from "@/lib/scoringRules";
 import { countsForScore, type VerificationStatus } from "@/lib/verificationRules";
@@ -81,6 +81,31 @@ export async function joinGame(input: {
   if (game.status === "ended") throw new Error("That game has already finished");
 
   const wantedGroup = input.groupName.trim() || "Solo Trackers";
+
+  // The player row is created first: group creation is only allowed for people
+  // who are already part of the game.
+  const { data: existing } = await supabase
+    .from("players")
+    .select("*")
+    .eq("game_id", game.id)
+    .eq("device_id", input.deviceId)
+    .maybeSingle();
+
+  let player = existing as Player | null;
+  if (!player) {
+    const { data: created, error: playerError } = await supabase
+      .from("players")
+      .insert({
+        game_id: game.id,
+        name: input.playerName,
+        device_id: input.deviceId,
+      })
+      .select()
+      .single();
+    if (playerError) throw playerError;
+    player = created as Player;
+  }
+
   const { data: groups, error: groupsError } = await supabase
     .from("groups")
     .select("*")
@@ -100,37 +125,15 @@ export async function joinGame(input: {
     group = created;
   }
 
-  const { data: existing } = await supabase
+  const { data: updated, error: updateError } = await supabase
     .from("players")
-    .select("*")
-    .eq("game_id", game.id)
-    .eq("device_id", input.deviceId)
-    .maybeSingle();
-
-  if (existing) {
-    const { data: updated, error: updateError } = await supabase
-      .from("players")
-      .update({ name: input.playerName, group_id: group.id })
-      .eq("id", existing.id)
-      .select()
-      .single();
-    if (updateError) throw updateError;
-    return { game: game as Game, player: updated as Player };
-  }
-
-  const { data: player, error: playerError } = await supabase
-    .from("players")
-    .insert({
-      game_id: game.id,
-      group_id: group.id,
-      name: input.playerName,
-      device_id: input.deviceId,
-    })
+    .update({ name: input.playerName, group_id: group.id })
+    .eq("id", player.id)
     .select()
     .single();
-  if (playerError) throw playerError;
+  if (updateError) throw updateError;
 
-  return { game: game as Game, player: player as Player };
+  return { game: game as Game, player: updated as Player };
 }
 
 export async function fetchGame(gameId: string): Promise<Game> {

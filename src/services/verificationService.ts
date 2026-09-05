@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db as supabase } from "@/lib/db";
 import type { Json } from "@/integrations/supabase/types";
 import { verifySighting } from "@/lib/verify.functions";
 import type { VerificationOutcome } from "@/lib/verify.functions";
