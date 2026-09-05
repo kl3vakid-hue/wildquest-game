@@ -21,7 +21,9 @@ import { useGameSession } from "@/hooks/useGameSession";
 import type { IdentificationResult } from "@/lib/identify.functions";
 import { identifyAnimal } from "@/lib/identify.functions";
 import { recordSighting } from "@/services/gameService";
+import { cached } from "@/services/offlineCache";
 import { enqueueSighting } from "@/services/offlineQueue";
+
 import {
   enqueueIdentification,
   flushIdentifyQueue,
