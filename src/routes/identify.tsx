@@ -130,6 +130,41 @@ function Identify() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Photos taken with no signal are identified automatically once it returns.
+  useEffect(() => {
+    setPendingIdentifications(readIdentifyQueue().length);
+    if (!state.online) return;
+    let cancelled = false;
+    (async () => {
+      const queued = readIdentifyQueue();
+      if (!queued.length) return;
+      setSyncing(true);
+      try {
+        const outcomes = await flushIdentifyQueue();
+        if (cancelled) return;
+        for (const outcome of outcomes) {
+          if (outcome.knownAnimalName) {
+            toast.success(`${outcome.knownAnimalName} is already in our Spot an Animal list!`);
+          } else if (outcome.result.status === "identified" && outcome.result.animalName) {
+            toast.success(`Identified from your offline photo: ${outcome.result.animalName}`);
+          } else {
+            toast.info("One offline photo could not be identified with enough confidence.");
+          }
+        }
+        void refreshHistory();
+      } finally {
+        if (!cancelled) {
+          setSyncing(false);
+          setPendingIdentifications(readIdentifyQueue().length);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.online]);
+
   async function handleFile(file: File | undefined) {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
@@ -153,8 +188,32 @@ function Identify() {
     if (uploadRef.current) uploadRef.current.value = "";
   }
 
+  function queueForLater(dataUrl: string, message: string) {
+    enqueueIdentification({
+      localId: `id-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      imageDataUrl: dataUrl,
+      createdAt: new Date().toISOString(),
+      savePhoto,
+      deviceId,
+      gameId: state.session?.gameId ?? null,
+      playerId: state.session?.playerId ?? null,
+    });
+    setPendingIdentifications(readIdentifyQueue().length);
+    clearPhoto();
+    toast.success(message);
+  }
+
   async function handleIdentify() {
     if (!preview) return;
+
+    if (!state.online) {
+      queueForLater(
+        preview.dataUrl,
+        "Photo saved — we'll identify it as soon as you have signal.",
+      );
+      return;
+    }
+
     setLoading(true);
     setResult(null);
     setKnown(undefined);
@@ -195,13 +254,19 @@ function Identify() {
         toast.error("Identification saved on screen only — the database was unavailable.");
       }
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Identification failed. Please try again.",
-      );
+      const dataUrl = preview.dataUrl;
+      if (!navigator.onLine) {
+        queueForLater(dataUrl, "Signal dropped — the photo is saved and will be identified later.");
+      } else {
+        toast.error(
+          error instanceof Error ? error.message : "Identification failed. Please try again.",
+        );
+      }
     } finally {
       setLoading(false);
     }
   }
+
 
   async function handleSpotDiscovery(name: string, rarity: Rarity | null) {
     if (!state.session || !state.me) {
