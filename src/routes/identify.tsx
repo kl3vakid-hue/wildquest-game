@@ -104,6 +104,9 @@ function Identify() {
   const [savePhoto, setSavePhoto] = useState(true);
   const [history, setHistory] = useState<StoredIdentification[]>([]);
   const [historyUrls, setHistoryUrls] = useState<Record<string, string>>({});
+  const [pendingIdentifications, setPendingIdentifications] = useState(0);
+  const [syncing, setSyncing] = useState(false);
+
 
   const deviceId = typeof window === "undefined" ? "server" : getDeviceId();
 
