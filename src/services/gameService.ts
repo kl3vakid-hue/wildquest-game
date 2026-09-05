@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db as supabase } from "@/lib/db";
 import { achievementBonus } from "@/lib/achievements";
 import { scoreSightings } from "@/lib/scoringRules";
 import { countsForScore, type VerificationStatus } from "@/lib/verificationRules";

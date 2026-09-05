@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { db as supabase } from "@/lib/db";
 import type { IdentificationResult } from "@/lib/identify.functions";
 import type { Rarity } from "@/types";
 

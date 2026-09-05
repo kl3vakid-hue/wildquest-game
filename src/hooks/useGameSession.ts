@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { db as supabase } from "@/lib/db";
 import { achievementProgress, type AchievementProgress } from "@/lib/achievements";
 import { reputationFor, type Reputation } from "@/lib/reputation";
 import {
