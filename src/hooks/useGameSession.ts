@@ -69,6 +69,9 @@ export interface GameSessionState {
   groupStandings: GroupStanding[];
   pendingCount: number;
   online: boolean;
+  /** When the device last managed to reach the server, for offline screens. */
+  lastSynced: string | null;
+
   isHost: boolean;
   refresh: () => void;
 }
