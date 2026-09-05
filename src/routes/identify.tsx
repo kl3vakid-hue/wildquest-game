@@ -118,8 +118,11 @@ function Identify() {
 
   async function refreshHistory() {
     try {
-      const rows = await listMyIdentifications(deviceId);
+      const rows = await cached(`identifications.${deviceId}`, () =>
+        listMyIdentifications(deviceId),
+      );
       setHistory(rows);
+
       const urls: Record<string, string> = {};
       await Promise.all(
         rows.map(async (row) => {
