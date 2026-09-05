@@ -23,6 +23,12 @@ import { identifyAnimal } from "@/lib/identify.functions";
 import { recordSighting } from "@/services/gameService";
 import { enqueueSighting } from "@/services/offlineQueue";
 import {
+  enqueueIdentification,
+  flushIdentifyQueue,
+  readIdentifyQueue,
+} from "@/services/identifyQueue";
+
+import {
   deleteIdentification,
   getPhotoUrl,
   listMyIdentifications,
