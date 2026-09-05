@@ -85,12 +85,15 @@ function Lobby() {
           {me && !me.is_ready ? (
             <Button
               onClick={() =>
-                setReady(me.id, true).catch(() => toast.error("Could not mark ready"))
+                setReady(me.id, true)
+                  .then(() => state.refresh())
+                  .catch(() => toast.error("Could not mark ready"))
               }
             >
               <Check className="size-5" /> Ready
             </Button>
           ) : null}
+
 
           {state.isHost ? (
             <Button
