@@ -10,6 +10,7 @@ import { ScreenShell } from "@/components/ScreenShell";
 import { StatusBadge } from "@/components/StatusBadge";
 import { ANIMALS, RARITY_ORDER } from "@/data/animals";
 import { useGameSession } from "@/hooks/useGameSession";
+import { limitFor } from "@/lib/scoringRules";
 import { STATUS_HINT, type VerificationStatus } from "@/lib/verificationRules";
 import { enqueueSighting } from "@/services/offlineQueue";
 import { submitSighting } from "@/services/verificationService";
