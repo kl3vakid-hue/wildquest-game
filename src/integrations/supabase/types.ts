@@ -479,7 +479,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      find_game_by_code: {
+        Args: { _code: string }
+        Returns: {
+          id: string
+          name: string
+          status: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
