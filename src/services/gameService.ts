@@ -1,4 +1,5 @@
 import { db as supabase } from "@/lib/db";
+import { lookupGameByCode } from "@/lib/gameLookup.functions";
 import { achievementBonus } from "@/lib/achievements";
 import { scoreSightings } from "@/lib/scoringRules";
 import { countsForScore, type VerificationStatus } from "@/lib/verificationRules";
