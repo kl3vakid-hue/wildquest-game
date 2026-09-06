@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.find_game_by_code(text);
