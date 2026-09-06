@@ -71,14 +71,10 @@ export async function joinGame(input: {
   deviceId: string;
 }): Promise<{ game: Game; player: Player }> {
   const code = input.code.trim().toUpperCase();
-  const { data: game, error } = await supabase
-    .from("games")
-    .select("*")
-    .eq("code", code)
-    .maybeSingle();
-  if (error) throw error;
-  if (!game) throw new Error("No game found with that code");
-  if (game.status === "ended") throw new Error("That game has already finished");
+  const found = await lookupGameByCode({ data: { code } });
+  if (!found) throw new Error("No game found with that code");
+  if (found.status === "ended") throw new Error("That game has already finished");
+  const game = { id: found.id, name: found.name, status: found.status };
 
   const wantedGroup = input.groupName.trim() || "Solo Trackers";
 
