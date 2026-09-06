@@ -84,7 +84,12 @@ export function AnimalCard({
 
       {spotted ? (
         <span className="absolute right-1.5 top-1.5 flex items-center gap-0.5 rounded-full bg-accent px-1.5 py-0.5 text-[9px] font-bold uppercase text-accent-foreground">
-          <Check className="size-3" /> Spotted
+          <Check className="size-3" />
+          {mode === "spot" && count > 0
+            ? limit != null
+              ? `${count}/${limit}`
+              : `${count}×`
+            : "Spotted"}
         </span>
       ) : null}
       {locked ? (
