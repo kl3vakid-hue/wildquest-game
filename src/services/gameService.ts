@@ -130,7 +130,9 @@ export async function joinGame(input: {
     .single();
   if (updateError) throw updateError;
 
-  return { game: game as Game, player: updated as Player };
+  // Now that this device is a member, the full game row is readable.
+  const fullGame = await fetchGame(game.id);
+  return { game: fullGame, player: updated as Player };
 }
 
 export async function fetchGame(gameId: string): Promise<Game> {
