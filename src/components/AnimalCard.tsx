@@ -10,6 +10,10 @@ interface AnimalCardProps {
   spotted: boolean;
   /** Collection mode shows unspotted animals as dark silhouettes. */
   mode?: "spot" | "collection";
+  /** How many times this player has logged this species (spot mode badge). */
+  spottedCount?: number;
+  /** How many logged sightings of this species can still earn points, null = unlimited. */
+  limit?: number | null;
   /** Overrides the built-in photo, e.g. the user's own AI-identified photo. */
   photoUrl?: string | undefined;
   onSelect?: (animal: Animal) => void;
@@ -19,11 +23,16 @@ export function AnimalCard({
   animal,
   spotted,
   mode = "spot",
+  spottedCount,
+  limit,
   photoUrl,
   onSelect,
 }: AnimalCardProps) {
   const locked = mode === "collection" && !spotted;
-  const disabled = mode === "spot" && spotted && !animal.repeatable;
+  const count = spottedCount ?? (spotted ? 1 : 0);
+  // A species can be logged again until the host's per-rarity limit is reached.
+  const atLimit = limit != null && count >= limit;
+  const disabled = mode === "spot" && atLimit;
   const photo = photoUrl ?? ANIMAL_PHOTOS[animal.id];
 
   return (
