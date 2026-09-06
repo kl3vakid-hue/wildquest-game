@@ -23,8 +23,8 @@ export function ScreenShell({
   action,
 }: ScreenShellProps) {
   return (
-    <div className="bg-veld min-h-screen">
-      <div className="mx-auto max-w-md px-4 pb-28 pt-6">
+    <div className="bg-veld min-h-dvh">
+      <div className="nav-content-bottom-safe mx-auto max-w-md px-4 pt-6">
         <header className="mb-5 flex items-start justify-between gap-3">
           <div>
             <h1 className="display text-3xl leading-none text-gold-gradient">{title}</h1>

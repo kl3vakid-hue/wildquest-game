@@ -57,7 +57,7 @@ export function CaptureSheet({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-background/80 backdrop-blur-sm">
-      <div className="surface max-h-[92vh] w-full overflow-y-auto rounded-b-none p-5">
+      <div className="surface w-full max-h-[92dvh] overflow-y-auto rounded-b-none px-5 pb-[calc(1.25rem+var(--safe-area-bottom))] pt-5">
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
