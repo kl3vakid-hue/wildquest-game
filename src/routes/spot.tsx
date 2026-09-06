@@ -66,10 +66,24 @@ function Spot() {
     [query, rarity],
   );
 
+  /** How many times this tracker has logged each species (rejected ones don't count). */
+  const spottedCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const sighting of state.mySightings) {
+      if (sighting.verification_status === "rejected") continue;
+      counts.set(sighting.animal_id, (counts.get(sighting.animal_id) ?? 0) + 1);
+    }
+    return counts;
+  }, [state.mySightings]);
+
   function handleSelect(animal: Animal) {
     if (!state.session || !state.me) return;
-    if (state.myAnimalIds.has(animal.id)) {
-      toast.info(`${animal.name} is already in your collection`);
+    const count = spottedCounts.get(animal.id) ?? 0;
+    const limit = limitFor(state.rarityLimits, animal.rarity);
+    if (limit != null && count >= limit) {
+      toast.info(
+        `You've already logged ${animal.name} ${limit} ${limit === 1 ? "time" : "times"} — that's the limit for ${animal.rarity} animals in this game.`,
+      );
       return;
     }
     setOutcome(null);
