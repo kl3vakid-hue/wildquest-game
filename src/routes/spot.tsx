@@ -222,6 +222,8 @@ function Spot() {
             key={animal.id}
             animal={animal}
             spotted={state.myAnimalIds.has(animal.id)}
+            spottedCount={spottedCounts.get(animal.id) ?? 0}
+            limit={limitFor(state.rarityLimits, animal.rarity)}
             mode="spot"
             onSelect={handleSelect}
           />
