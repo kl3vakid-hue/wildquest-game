@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { isNetworkError, withTimeout } from "@/lib/network";
 import { useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
@@ -232,12 +233,14 @@ function Identify() {
     setResult(null);
     setKnown(undefined);
     try {
-      const identification = await identifyAnimal({
-        data: {
-          imageDataUrl: preview.dataUrl,
-          knownAnimals: ANIMALS.map((a) => a.name),
-        },
-      });
+      const identification = await withTimeout(
+        identifyAnimal({
+          data: {
+            imageDataUrl: preview.dataUrl,
+            knownAnimals: ANIMALS.map((a) => a.name),
+          },
+        }),
+      );
       setResult(identification);
 
       if (identification.status === "low_confidence") return;
@@ -269,7 +272,7 @@ function Identify() {
       }
     } catch (error) {
       const dataUrl = preview.dataUrl;
-      if (!navigator.onLine) {
+      if (isNetworkError(error)) {
         queueForLater(dataUrl, "Signal dropped — the photo is saved and will be identified later.");
       } else {
         toast.error(

@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { isNetworkError } from "@/lib/network";
 import { useEffect, useMemo, useState } from "react";
 import { db as supabase } from "@/lib/db";
 import { achievementProgress, type AchievementProgress } from "@/lib/achievements";
@@ -214,8 +215,9 @@ export function useGameSession(): GameSessionState {
               createdAt: item.createdAt,
             });
           }
-        } catch {
-          // Keep it queued unless the row already exists (duplicate claim).
+        } catch (err) {
+          // Still no real signal: keep it queued and try again later.
+          if (isNetworkError(err)) break;
         }
         removeQueued(item.localId);
       }
