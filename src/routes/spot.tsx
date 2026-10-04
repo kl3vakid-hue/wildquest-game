@@ -95,13 +95,14 @@ function Spot() {
   async function handleSubmit({ photo, geo }: CaptureSubmission) {
     if (!state.session || !target) return;
     const animal = target;
+    const session = state.session;
 
-    if (!state.online) {
+    const saveForLater = (message: string) => {
       enqueueSighting({
         localId: `${animal.id}-${Date.now()}`,
         createdAt: new Date().toISOString(),
-        gameId: state.session.gameId,
-        playerId: state.session.playerId,
+        gameId: session.gameId,
+        playerId: session.playerId,
         animalId: animal.id,
         animalName: animal.name,
         rarity: animal.rarity,
@@ -112,28 +113,35 @@ function Spot() {
         latitude: geo?.latitude ?? null,
         longitude: geo?.longitude ?? null,
         gpsAccuracy: geo?.accuracy ?? null,
-        deviceId: state.session.deviceId,
+        deviceId: session.deviceId,
       });
       setTarget(null);
       setOutcome({ animal, status: "pending", reason: null, verdict: null });
-      toast.success(`${animal.name} saved — it will be verified when you have signal`);
+      toast.success(message);
       state.refresh();
+    };
+
+    if (!state.online) {
+      saveForLater(`${animal.name} saved — it will be verified when you have signal`);
       return;
     }
 
     setBusy(true);
     try {
-      const result = await submitSighting({
-        gameId: state.session.gameId,
-        playerId: state.session.playerId,
-        deviceId: state.session.deviceId,
-        animalId: animal.id,
-        animalName: animal.name,
-        rarity: animal.rarity,
-        points: animal.points,
-        photo,
-        geo,
-      });
+      const result = await withTimeout(
+        submitSighting({
+          gameId: session.gameId,
+          playerId: session.playerId,
+          deviceId: session.deviceId,
+          animalId: animal.id,
+          animalName: animal.name,
+          rarity: animal.rarity,
+          points: animal.points,
+          photo,
+          geo,
+        }),
+        30000,
+      );
       setTarget(null);
       setOutcome({
         animal,
@@ -152,7 +160,11 @@ function Spot() {
       }
       state.refresh();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Verification failed. Please try again.");
+      if (isNetworkError(err)) {
+        saveForLater(`Weak signal — ${animal.name} saved and will be verified later`);
+      } else {
+        toast.error(err instanceof Error ? err.message : "Verification failed. Please try again.");
+      }
     } finally {
       setBusy(false);
     }

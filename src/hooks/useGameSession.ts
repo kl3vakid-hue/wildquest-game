@@ -214,8 +214,9 @@ export function useGameSession(): GameSessionState {
               createdAt: item.createdAt,
             });
           }
-        } catch {
-          // Keep it queued unless the row already exists (duplicate claim).
+        } catch (err) {
+          // Still no real signal: keep it queued and try again later.
+          if (isNetworkError(err)) break;
         }
         removeQueued(item.localId);
       }
