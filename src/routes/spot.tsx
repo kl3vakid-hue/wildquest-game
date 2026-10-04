@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { isNetworkError, withTimeout } from "@/lib/network";
 import { useEffect, useMemo, useState } from "react";
 import { Camera, Search, ShieldCheck } from "lucide-react";
 
