@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { isNetworkError } from "@/lib/network";
 import { useEffect, useMemo, useState } from "react";
 import { db as supabase } from "@/lib/db";
 import { achievementProgress, type AchievementProgress } from "@/lib/achievements";
