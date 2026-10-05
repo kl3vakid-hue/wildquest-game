@@ -40,12 +40,12 @@ export function AnimalCard({
       type="button"
       whileTap={{ scale: disabled ? 1 : 0.94 }}
       onClick={() => !disabled && onSelect?.(animal)}
-      disabled={disabled || mode === "collection"}
+      disabled={disabled || (mode === "collection" && (locked || !onSelect))}
       className={cn(
         "surface relative flex aspect-[3/4] w-full flex-col overflow-hidden border-2 text-center transition-opacity",
         RARITY_RING[animal.rarity],
         disabled && "opacity-60",
-        mode === "collection" && "cursor-default",
+        mode === "collection" && (locked || !onSelect) && "cursor-default",
       )}
     >
       <div className="relative h-[58%] w-full overflow-hidden bg-secondary">
