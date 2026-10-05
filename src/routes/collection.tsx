@@ -4,6 +4,9 @@ import { motion } from "framer-motion";
 import { AnimalCard } from "@/components/AnimalCard";
 import { ScreenShell } from "@/components/ScreenShell";
 import { ANIMALS, RARITY_ORDER, TOTAL_ANIMALS } from "@/data/animals";
+import { ANIMAL_FACTS } from "@/data/animalFacts";
+import { ANIMAL_PHOTOS } from "@/data/animalPhotos";
+import { Lightbulb, X } from "lucide-react";
 import { AI_ANIMAL_RARITY, isAiAnimalId } from "@/data/discovered";
 import { useGameSession } from "@/hooks/useGameSession";
 import { getPhotoUrl, listMyIdentifications } from "@/services/identifyService";
@@ -35,6 +38,8 @@ function Collection() {
   const navigate = useNavigate();
   const state = useGameSession();
   const [photos, setPhotos] = useState<Record<string, string>>({});
+  const [aiFacts, setAiFacts] = useState<Record<string, string>>({});
+  const [selected, setSelected] = useState<Animal | null>(null);
 
   useEffect(() => {
     if (state.ready && !state.session) navigate({ to: "/" });
@@ -47,16 +52,22 @@ function Collection() {
       try {
         const rows = await listMyIdentifications(getDeviceId());
         const map: Record<string, string> = {};
+        const facts: Record<string, string> = {};
         await Promise.all(
           rows.map(async (row) => {
             if (!row.image_path) return;
             const key = row.animal_name.toLowerCase();
+            const fact = row.interesting_facts?.[0];
+            if (fact && !facts[key]) facts[key] = fact;
             if (map[key]) return;
             const url = await getPhotoUrl(row.image_path);
             if (url) map[key] = url;
           }),
         );
-        if (!cancelled) setPhotos(map);
+        if (!cancelled) {
+          setPhotos(map);
+          setAiFacts(facts);
+        }
       } catch {
         /* photos are non-critical */
       }
@@ -105,6 +116,10 @@ function Collection() {
 
 
 
+      <p className="mt-3 text-xs text-muted-foreground">
+        Tap an animal you've spotted to reveal an interesting fact.
+      </p>
+
       {RARITY_ORDER.map((rarity) => {
         const animals = ANIMALS.filter((animal) => animal.rarity === rarity);
         const extras = discovered.filter((animal) => animal.rarity === rarity);
@@ -124,6 +139,7 @@ function Collection() {
                   animal={animal}
                   spotted={state.verifiedAnimalIds.has(animal.id)}
                   mode="collection"
+                  onSelect={setSelected}
                 />
               ))}
               {extras.map((animal) => (
@@ -133,12 +149,60 @@ function Collection() {
                   spotted
                   mode="collection"
                   photoUrl={photos[animal.name.toLowerCase()]}
+                  onSelect={setSelected}
                 />
               ))}
             </div>
           </section>
         );
       })}
+      {selected ? (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-background/80 p-4 pb-safe-sheet sm:items-center"
+          onClick={() => setSelected(null)}
+        >
+          <motion.div
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="surface w-full max-w-md overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {(photos[selected.name.toLowerCase()] ?? ANIMAL_PHOTOS[selected.id]) ? (
+              <img
+                src={photos[selected.name.toLowerCase()] ?? ANIMAL_PHOTOS[selected.id]}
+                alt={selected.name}
+                className="h-48 w-full object-cover"
+              />
+            ) : null}
+            <div className="p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="display text-2xl">{selected.name}</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {selected.rarity} · {selected.points} pts
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Close"
+                  onClick={() => setSelected(null)}
+                  className="rounded-full bg-secondary p-2 text-muted-foreground"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+              <div className="mt-3 flex items-start gap-2 rounded-2xl bg-secondary/60 p-3">
+                <Lightbulb className="mt-0.5 size-4 shrink-0 text-primary" />
+                <p className="text-sm text-foreground">
+                  {ANIMAL_FACTS[selected.id] ??
+                    aiFacts[selected.name.toLowerCase()] ??
+                    "A rare find — keep exploring to learn more about this species."}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      ) : null}
     </ScreenShell>
   );
 }
