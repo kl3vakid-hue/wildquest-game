@@ -158,7 +158,8 @@ function Collection() {
       })}
       {selected ? (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-background/80 p-4 pb-safe-sheet sm:items-center"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-background/80 p-4 sm:items-center"
+          style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}
           onClick={() => setSelected(null)}
         >
           <motion.div
