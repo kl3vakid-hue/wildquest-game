@@ -3,7 +3,15 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, Binoculars, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/Button";
-import { getDeviceId, loadSession, recalledName, rememberName } from "@/utils/session";
+import { AvatarPicker } from "@/components/AvatarPicker";
+import {
+  getDeviceId,
+  loadSession,
+  recalledAvatar,
+  recalledName,
+  rememberAvatar,
+  rememberName,
+} from "@/utils/session";
 
 export const Route = createFileRoute("/profile")({
   ssr: false,
@@ -29,9 +37,11 @@ function Profile() {
   const [name, setName] = useState("");
   const [deviceId, setDeviceId] = useState("");
   const [hasSession, setHasSession] = useState(false);
+  const [avatar, setAvatar] = useState("");
 
   useEffect(() => {
     setName(recalledName());
+    setAvatar(recalledAvatar());
     setDeviceId(getDeviceId());
     setHasSession(Boolean(loadSession()));
   }, []);
@@ -47,6 +57,21 @@ function Profile() {
         </button>
 
         <h1 className="display text-4xl text-gold-gradient">My Profile</h1>
+
+        <div className="mt-6">
+          <AvatarPicker
+            value={avatar}
+            onChange={(v) => {
+              try {
+                rememberAvatar(v);
+                setAvatar(v ?? "");
+                toast.success(v ? "Profile picture saved" : "Profile picture removed");
+              } catch {
+                toast.error("Photo too large to save on this device");
+              }
+            }}
+          />
+        </div>
 
         <div className="mt-6 space-y-3">
           <input

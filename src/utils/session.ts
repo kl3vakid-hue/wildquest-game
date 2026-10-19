@@ -56,3 +56,17 @@ export function rememberName(name: string): void {
 export function recalledName(): string {
   return safeStorage()?.getItem(NAME_KEY) ?? "";
 }
+
+const AVATAR_KEY = "wildquest.avatar";
+
+/** Avatar is either an emoji ("emoji:🦁") or a small image data URL, stored on this device. */
+export function rememberAvatar(value: string | null): void {
+  const store = safeStorage();
+  if (!store) return;
+  if (value) store.setItem(AVATAR_KEY, value);
+  else store.removeItem(AVATAR_KEY);
+}
+
+export function recalledAvatar(): string {
+  return safeStorage()?.getItem(AVATAR_KEY) ?? "";
+}
