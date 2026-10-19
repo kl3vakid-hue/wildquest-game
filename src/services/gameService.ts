@@ -7,6 +7,15 @@ import { fetchCustomAchievements, toAchievement } from "@/services/achievementSe
 import { fetchRarityLimits } from "@/services/settingsService";
 import type { Game, Group, Player, Rarity, Sighting } from "@/types";
 import { generateGameCode } from "@/utils/format";
+import { recalledAvatar } from "@/utils/session";
+
+/** Pushes this device's name and picture to every game it has joined, so all players see them. */
+export async function syncMyProfile(deviceId: string, name: string | null, avatar: string | null) {
+  const patch: { avatar: string | null; name?: string } = { avatar };
+  if (name) patch.name = name;
+  await supabase.from("players").update(patch).eq("device_id", deviceId);
+}
+
 
 /** Creates a game with its first group and the host player. */
 export async function createGame(input: {
@@ -45,6 +54,7 @@ export async function createGame(input: {
       game_id: game.id,
       group_id: group.id,
       name: input.playerName,
+      avatar: recalledAvatar() || null,
       device_id: input.deviceId,
       is_host: true,
       is_ready: true,
@@ -124,7 +134,7 @@ export async function joinGame(input: {
 
   const { data: updated, error: updateError } = await supabase
     .from("players")
-    .update({ name: input.playerName, group_id: group.id })
+    .update({ name: input.playerName, group_id: group.id, avatar: recalledAvatar() || null })
     .eq("id", player.id)
     .select()
     .single();

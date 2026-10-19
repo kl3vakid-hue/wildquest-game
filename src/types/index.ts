@@ -35,6 +35,7 @@ export interface Player {
   game_id: string;
   group_id: string | null;
   name: string;
+  avatar?: string | null;
   device_id: string;
   score: number;
   is_ready: boolean;

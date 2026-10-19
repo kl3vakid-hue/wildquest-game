@@ -226,6 +226,7 @@ export type Database = {
       }
       players: {
         Row: {
+          avatar: string | null
           created_at: string
           device_id: string
           game_id: string
@@ -237,6 +238,7 @@ export type Database = {
           score: number
         }
         Insert: {
+          avatar?: string | null
           created_at?: string
           device_id: string
           game_id: string
@@ -248,6 +250,7 @@ export type Database = {
           score?: number
         }
         Update: {
+          avatar?: string | null
           created_at?: string
           device_id?: string
           game_id?: string
