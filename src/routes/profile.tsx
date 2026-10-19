@@ -1,17 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Binoculars, Camera, Smartphone, User } from "lucide-react";
+import { ArrowLeft, Binoculars, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/Button";
-import {
-  getDeviceId,
-  loadSession,
-  recalledAvatar,
-  recalledName,
-  rememberAvatar,
-  rememberName,
-  resizeAvatar,
-} from "@/utils/session";
+import { getDeviceId, loadSession, recalledName, rememberName } from "@/utils/session";
 
 export const Route = createFileRoute("/profile")({
   ssr: false,
@@ -35,13 +27,11 @@ export const Route = createFileRoute("/profile")({
 function Profile() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
-  const [avatar, setAvatar] = useState<string | null>(null);
   const [deviceId, setDeviceId] = useState("");
   const [hasSession, setHasSession] = useState(false);
 
   useEffect(() => {
     setName(recalledName());
-    setAvatar(recalledAvatar());
     setDeviceId(getDeviceId());
     setHasSession(Boolean(loadSession()));
   }, []);
@@ -57,53 +47,6 @@ function Profile() {
         </button>
 
         <h1 className="display text-4xl text-gold-gradient">My Profile</h1>
-
-        <div className="mt-6 flex items-center gap-4">
-          <label className="relative cursor-pointer">
-            <div className="flex size-24 items-center justify-center overflow-hidden rounded-full border-2 border-primary bg-input">
-              {avatar ? (
-                <img src={avatar} alt="Profile picture" className="size-full object-cover" />
-              ) : (
-                <User className="size-10 text-muted-foreground" />
-              )}
-            </div>
-            <span className="absolute -bottom-1 -right-1 flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
-              <Camera className="size-4" />
-            </span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                e.target.value = "";
-                if (!file) return;
-                try {
-                  const data = await resizeAvatar(file);
-                  rememberAvatar(data);
-                  setAvatar(data);
-                  toast.success("Profile picture saved");
-                } catch {
-                  toast.error("Couldn't use that photo");
-                }
-              }}
-            />
-          </label>
-          <div className="text-sm text-muted-foreground">
-            <p>Tap to add a profile picture.</p>
-            {avatar ? (
-              <button
-                className="mt-1 text-destructive underline"
-                onClick={() => {
-                  rememberAvatar(null);
-                  setAvatar(null);
-                }}
-              >
-                Remove
-              </button>
-            ) : null}
-          </div>
-        </div>
 
         <div className="mt-6 space-y-3">
           <input
