@@ -45,6 +45,7 @@ export async function createGame(input: {
       game_id: game.id,
       group_id: group.id,
       name: input.playerName,
+      avatar: recalledAvatar() || null,
       device_id: input.deviceId,
       is_host: true,
       is_ready: true,
@@ -124,7 +125,7 @@ export async function joinGame(input: {
 
   const { data: updated, error: updateError } = await supabase
     .from("players")
-    .update({ name: input.playerName, group_id: group.id })
+    .update({ name: input.playerName, group_id: group.id, avatar: recalledAvatar() || null })
     .eq("id", player.id)
     .select()
     .single();
