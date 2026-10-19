@@ -56,3 +56,40 @@ export function rememberName(name: string): void {
 export function recalledName(): string {
   return safeStorage()?.getItem(NAME_KEY) ?? "";
 }
+
+const AVATAR_KEY = "wildquest.avatar";
+
+export function rememberAvatar(dataUrl: string | null): void {
+  const store = safeStorage();
+  if (!store) return;
+  if (dataUrl) store.setItem(AVATAR_KEY, dataUrl);
+  else store.removeItem(AVATAR_KEY);
+}
+
+export function recalledAvatar(): string | null {
+  return safeStorage()?.getItem(AVATAR_KEY) ?? null;
+}
+
+/** Shrinks a picked photo to a small square JPEG so it fits in device storage. */
+export function resizeAvatar(file: File, size = 256): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return reject(new Error("No canvas"));
+      const s = Math.min(img.width, img.height);
+      ctx.drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL("image/jpeg", 0.85));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Could not read image"));
+    };
+    img.src = url;
+  });
+}
