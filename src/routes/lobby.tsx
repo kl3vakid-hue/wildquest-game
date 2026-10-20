@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { AvatarView } from "@/components/AvatarPicker";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Check, Crown, Play, Users } from "lucide-react";
@@ -63,6 +64,7 @@ function Lobby() {
                 className="flex items-center justify-between rounded-xl bg-secondary px-3 py-2.5"
               >
                 <span className="flex items-center gap-2 text-sm font-medium">
+                  <AvatarView value={player.avatar} className="size-8" />
                   {player.is_host ? <Crown className="size-4 text-primary" /> : null}
                   {player.name}
                   <span className="text-xs text-muted-foreground">

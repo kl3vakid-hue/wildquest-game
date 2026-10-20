@@ -20,7 +20,7 @@ async function cropToDataUrl(src: string, area: Area, size = 256): Promise<strin
   return canvas.toDataURL("image/jpeg", 0.8);
 }
 
-export function AvatarView({ value, className = "size-24" }: { value?: string | null; className?: string }) {
+export function AvatarView({ value, className = "size-24" }: { value?: string | null | undefined; className?: string }) {
   const small = !className.includes("size-24");
   if (value?.startsWith("emoji:")) {
     return (

@@ -4,6 +4,7 @@ import { ArrowLeft, Binoculars, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/Button";
 import { AvatarPicker } from "@/components/AvatarPicker";
+import { syncMyProfile } from "@/services/gameService";
 import {
   getDeviceId,
   loadSession,
@@ -65,6 +66,7 @@ function Profile() {
               try {
                 rememberAvatar(v);
                 setAvatar(v ?? "");
+                void syncMyProfile(getDeviceId(), null, v).catch(() => {});
                 toast.success(v ? "Profile picture saved" : "Profile picture removed");
               } catch {
                 toast.error("Photo too large to save on this device");
@@ -87,6 +89,7 @@ function Profile() {
                 return;
               }
               rememberName(name.trim());
+              void syncMyProfile(getDeviceId(), name.trim(), avatar || null).catch(() => {});
               toast.success("Name saved");
             }}
           >

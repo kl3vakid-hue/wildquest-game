@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { AvatarView } from "@/components/AvatarPicker";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Crown, ShieldCheck, Users } from "lucide-react";
@@ -83,6 +84,7 @@ function Rankings() {
               <span className="display w-8 text-center text-2xl">
                 {MEDALS[index] ?? index + 1}
               </span>
+              <AvatarView value={player.avatar} className="size-10" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold">
                   {player.name}
