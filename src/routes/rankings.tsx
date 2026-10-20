@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { AvatarView } from "@/components/AvatarPicker";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Crown, ShieldCheck, Users } from "lucide-react";
