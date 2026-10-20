@@ -107,24 +107,29 @@ function GroupScreen() {
           </p>
         ) : (
           <ul className="space-y-2">
-            {recent.map((sighting) => (
-              <li
-                key={sighting.id}
-                className="flex items-center justify-between rounded-xl bg-secondary px-4 py-2.5 text-sm"
-              >
-                <span className="truncate">
-                  <span className="font-semibold">{sighting.animal_name}</span>{" "}
-                  <span className="text-xs text-muted-foreground">
-                    by{" "}
-                    {state.players.find((p) => p.id === sighting.player_id)?.name ??
-                      "someone"}
+            {recent.map((sighting) => {
+              const spotter = state.players.find((p) => p.id === sighting.player_id);
+              return (
+                <li
+                  key={sighting.id}
+                  className="flex items-center justify-between gap-3 rounded-xl bg-secondary px-4 py-2.5 text-sm"
+                >
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    <AvatarView value={spotter?.avatar} className="size-8" />
+                    <span className="min-w-0 truncate">
+                      <span className="font-semibold">{sighting.animal_name}</span>{" "}
+                      <span className="text-xs text-muted-foreground">
+                        by{" "}
+                        {spotter?.name ?? "someone"}
+                      </span>
+                    </span>
                   </span>
-                </span>
-                <span className="shrink-0 text-xs text-muted-foreground">
-                  {formatTime(sighting.created_at)}
-                </span>
-              </li>
-            ))}
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    {formatTime(sighting.created_at)}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

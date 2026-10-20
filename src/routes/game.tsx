@@ -1,14 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { AvatarView } from "@/components/AvatarPicker";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Award, Binoculars, BookMarked, Camera, Flag, ShieldAlert, Trophy, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/Button";
 import { ScreenShell } from "@/components/ScreenShell";
+import { StatusBadge, toStatus } from "@/components/StatusBadge";
 import { TOTAL_ANIMALS } from "@/data/animals";
 import { useGameSession } from "@/hooks/useGameSession";
 import { endGame } from "@/services/gameService";
-import { formatPoints } from "@/utils/format";
+import { formatPoints, formatTime } from "@/utils/format";
 
 export const Route = createFileRoute("/game")({
   ssr: false,
@@ -75,6 +77,48 @@ function Dashboard() {
           />
         </div>
       </motion.section>
+
+      <section className="mt-6">
+        <h2 className="mb-2 text-sm text-muted-foreground">Safari feed</h2>
+        {(() => {
+          const feed = [...state.sightings]
+            .sort((a, b) => b.created_at.localeCompare(a.created_at))
+            .slice(0, 15);
+          if (feed.length === 0) {
+            return (
+              <p className="text-sm text-muted-foreground">
+                No sightings yet — be the first to spot something.
+              </p>
+            );
+          }
+          return (
+            <ul className="space-y-2">
+              {feed.map((sighting) => {
+                const player = state.players.find((p) => p.id === sighting.player_id);
+                return (
+                  <li
+                    key={sighting.id}
+                    className="flex items-center justify-between gap-3 rounded-xl bg-secondary px-4 py-2.5 text-sm"
+                  >
+                    <span className="flex min-w-0 items-center gap-2.5">
+                      <AvatarView value={player?.avatar} className="size-8" />
+                      <span className="min-w-0">
+                        <span className="block truncate font-semibold">{sighting.animal_name}</span>
+                        <span className="block truncate text-xs text-muted-foreground">
+                          {player?.name ?? "someone"}
+                          {player?.id === state.me?.id ? " (you)" : ""} ·{" "}
+                          {formatTime(sighting.created_at)}
+                        </span>
+                      </span>
+                    </span>
+                    <StatusBadge status={toStatus(sighting.verification_status)} />
+                  </li>
+                );
+              })}
+            </ul>
+          );
+        })()}
+      </section>
 
       <div className="mt-5 space-y-3">
         <Button onClick={() => navigate({ to: "/spot" })}>
