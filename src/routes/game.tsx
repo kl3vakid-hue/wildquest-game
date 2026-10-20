@@ -11,7 +11,6 @@ import { TOTAL_ANIMALS } from "@/data/animals";
 import { useGameSession } from "@/hooks/useGameSession";
 import { endGame } from "@/services/gameService";
 import { formatPoints, formatTime } from "@/utils/format";
-import { toStatus } from "@/lib/verificationRules";
 
 export const Route = createFileRoute("/game")({
   ssr: false,
