@@ -110,44 +110,67 @@ function Dashboard() {
 
       <section className="mt-6">
         <h2 className="mb-2 text-sm text-muted-foreground">Safari feed</h2>
-        {(() => {
-          const feed = [...state.sightings]
-            .sort((a, b) => b.created_at.localeCompare(a.created_at))
-            .slice(0, 15);
-          if (feed.length === 0) {
-            return (
-              <p className="text-sm text-muted-foreground">
-                No sightings yet — be the first to spot something.
-              </p>
-            );
-          }
-          return (
-            <ul className="space-y-2">
-              {feed.map((sighting) => {
-                const player = state.players.find((p) => p.id === sighting.player_id);
-                return (
-                  <li
-                    key={sighting.id}
-                    className="flex items-center justify-between gap-3 rounded-xl bg-secondary px-4 py-2.5 text-sm"
-                  >
-                    <span className="flex min-w-0 items-center gap-2.5">
-                      <AvatarView value={player?.avatar} className="size-8" />
-                      <span className="min-w-0">
-                        <span className="block truncate font-semibold">{sighting.animal_name}</span>
-                        <span className="block truncate text-xs text-muted-foreground">
-                          {player?.name ?? "someone"}
-                          {player?.id === state.me?.id ? " (you)" : ""} ·{" "}
-                          {formatTime(sighting.created_at)}
-                        </span>
+        <div className="grid grid-cols-2 gap-2">
+          <select
+            value={playerFilter}
+            onChange={(e) => setPlayerFilter(e.target.value)}
+            aria-label="Filter by player"
+            className="w-full truncate rounded-xl border border-border bg-input px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+          >
+            <option value="all">All players</option>
+            {feedPlayers.map((player) => (
+              <option key={player.id} value={player.id}>
+                {player.name}
+                {player.id === state.me?.id ? " (you)" : ""}
+              </option>
+            ))}
+          </select>
+          <select
+            value={animalFilter}
+            onChange={(e) => setAnimalFilter(e.target.value)}
+            aria-label="Filter by animal"
+            className="w-full truncate rounded-xl border border-border bg-input px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none"
+          >
+            <option value="all">All animals</option>
+            {feedAnimals.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
+        {feed.length === 0 ? (
+          <p className="mt-3 text-sm text-muted-foreground">
+            {state.sightings.length === 0
+              ? "No sightings yet — be the first to spot something."
+              : "No sightings match those filters."}
+          </p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {feed.map((sighting) => {
+              const player = state.players.find((p) => p.id === sighting.player_id);
+              return (
+                <li
+                  key={sighting.id}
+                  className="flex items-center justify-between gap-3 rounded-xl bg-secondary px-4 py-2.5 text-sm"
+                >
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    <AvatarView value={player?.avatar} className="size-8" />
+                    <span className="min-w-0">
+                      <span className="block truncate font-semibold">{sighting.animal_name}</span>
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {player?.name ?? "someone"}
+                        {player?.id === state.me?.id ? " (you)" : ""} ·{" "}
+                        {formatTime(sighting.created_at)}
                       </span>
                     </span>
-                    <StatusBadge status={toStatus(sighting.verification_status)} />
-                  </li>
-                );
-              })}
-            </ul>
-          );
-        })()}
+                  </span>
+                  <StatusBadge status={toStatus(sighting.verification_status)} />
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </section>
 
       <div className="mt-5 space-y-3">
