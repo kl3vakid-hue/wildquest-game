@@ -6,7 +6,7 @@ import { Award, Binoculars, BookMarked, Camera, Flag, ShieldAlert, Trophy, Users
 import { toast } from "sonner";
 import { Button } from "@/components/Button";
 import { ScreenShell } from "@/components/ScreenShell";
-import { StatusBadge } from "@/components/StatusBadge";
+import { StatusBadge, toStatus } from "@/components/StatusBadge";
 import { TOTAL_ANIMALS } from "@/data/animals";
 import { useGameSession } from "@/hooks/useGameSession";
 import { endGame } from "@/services/gameService";
