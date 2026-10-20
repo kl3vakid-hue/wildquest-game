@@ -46,6 +46,36 @@ function Dashboard() {
 
   const found = state.myAnimalIds.size;
 
+  /** Safari feed filters: sightings can be narrowed to one player and/or one animal. */
+  const [playerFilter, setPlayerFilter] = useState<string>("all");
+  const [animalFilter, setAnimalFilter] = useState<string>("all");
+  const feedPlayers = useMemo(
+    () =>
+      [...state.players]
+        .filter((p) => state.sightings.some((s) => s.player_id === p.id))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    [state.players, state.sightings],
+  );
+  const feedAnimals = useMemo(
+    () =>
+      [...new Set(state.sightings.map((s) => s.animal_name))].sort((a, b) =>
+        a.localeCompare(b),
+      ),
+    [state.sightings],
+  );
+  const feed = useMemo(
+    () =>
+      [...state.sightings]
+        .filter(
+          (s) =>
+            (playerFilter === "all" || s.player_id === playerFilter) &&
+            (animalFilter === "all" || s.animal_name === animalFilter),
+        )
+        .sort((a, b) => b.created_at.localeCompare(a.created_at))
+        .slice(0, 15),
+    [state.sightings, playerFilter, animalFilter],
+  );
+
   return (
     <ScreenShell
       title={state.game?.name ?? "WildQuest"}
