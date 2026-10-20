@@ -1,14 +1,17 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { AvatarView } from "@/components/AvatarPicker";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Award, Binoculars, BookMarked, Camera, Flag, ShieldAlert, Trophy, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/Button";
 import { ScreenShell } from "@/components/ScreenShell";
+import { StatusBadge } from "@/components/StatusBadge";
 import { TOTAL_ANIMALS } from "@/data/animals";
 import { useGameSession } from "@/hooks/useGameSession";
 import { endGame } from "@/services/gameService";
-import { formatPoints } from "@/utils/format";
+import { formatPoints, formatTime } from "@/utils/format";
+import { toStatus } from "@/lib/verificationRules";
 
 export const Route = createFileRoute("/game")({
   ssr: false,
