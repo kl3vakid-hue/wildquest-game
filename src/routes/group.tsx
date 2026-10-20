@@ -83,6 +83,7 @@ function GroupScreen() {
               className="surface flex items-center justify-between px-4 py-3"
             >
               <span className="flex items-center gap-2 text-sm font-medium">
+                <AvatarView value={member.avatar} className="size-8" />
                 {member.is_host ? <Crown className="size-4 text-primary" /> : null}
                 {member.name}
                 {member.id === state.me?.id ? (
