@@ -1,0 +1,2 @@
+ALTER TABLE public.games ADD COLUMN play_mode text NOT NULL DEFAULT 'individual';
+COMMENT ON COLUMN public.games.play_mode IS 'Scoring mode chosen by the host: individual (each tracker scores alone) or groups (points count for the tracker''s team).';

@@ -1,4 +1,5 @@
 import { db as supabase } from "@/lib/db";
+import type { PlayMode, RarityLimits } from "@/types";
 import { DEFAULT_RARITY_LIMITS, normalizeLimits, type RarityLimits } from "@/lib/scoringRules";
 
 /** Reads the per-game scoring limits, falling back to the defaults. */
@@ -27,4 +28,10 @@ export async function saveRarityLimits(
     .single();
   if (error) throw error;
   return normalizeLimits(data.rarity_limits);
+}
+
+/** Host-only: switches the game between individual scoring and team (group) scoring. */
+export async function setPlayMode(gameId: string, mode: PlayMode): Promise<void> {
+  const { error } = await supabase.from("games").update({ play_mode: mode }).eq("id", gameId);
+  if (error) throw error;
 }

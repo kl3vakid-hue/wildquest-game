@@ -15,6 +15,13 @@
       "when": 1792431216382,
       "tag": "0001_player_avatar",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792615348613,
+      "tag": "0002_add_play_mode_to_games",
+      "breakpoints": true
     }
   ]
 }

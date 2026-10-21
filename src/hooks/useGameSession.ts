@@ -68,6 +68,10 @@ export interface GameSessionState {
   flaggedSightings: Sighting[];
   leaderboard: Player[];
   groupStandings: GroupStanding[];
+  /** Host-chosen scoring mode: "groups" means points count for the team, not the player. */
+  playMode: PlayMode;
+  /** My team's combined score (always the sum of member scores; the headline score in group play). */
+  myGroupScore: number;
   pendingCount: number;
   online: boolean;
   /** When the device last managed to reach the server, for offline screens. */

@@ -173,6 +173,7 @@ export type Database = {
           host_player_id: string | null
           id: string
           name: string
+          play_mode: string
           status: string
         }
         Insert: {
@@ -182,6 +183,7 @@ export type Database = {
           host_player_id?: string | null
           id?: string
           name: string
+          play_mode?: string
           status?: string
         }
         Update: {
@@ -191,6 +193,7 @@ export type Database = {
           host_player_id?: string | null
           id?: string
           name?: string
+          play_mode?: string
           status?: string
         }
         Relationships: []
