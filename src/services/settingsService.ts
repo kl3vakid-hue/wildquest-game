@@ -28,3 +28,9 @@ export async function saveRarityLimits(
   if (error) throw error;
   return normalizeLimits(data.rarity_limits);
 }
+
+/** Host-only: switches the game between individual scoring and team (group) scoring. */
+export async function setPlayMode(gameId: string, mode: PlayMode): Promise<void> {
+  const { error } = await supabase.from("games").update({ play_mode: mode }).eq("id", gameId);
+  if (error) throw error;
+}

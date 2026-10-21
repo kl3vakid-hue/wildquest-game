@@ -13,12 +13,16 @@ export interface Animal {
 
 export type GameStatus = "lobby" | "active" | "ended";
 
+/** How the host wants scoring to work: alone or as teams. */
+export type PlayMode = "individual" | "groups";
+
 export interface Game {
   id: string;
   code: string;
   name: string;
   status: GameStatus;
   host_player_id: string | null;
+  play_mode: PlayMode;
   created_at: string;
   ended_at: string | null;
 }
