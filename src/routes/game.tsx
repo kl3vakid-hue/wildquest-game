@@ -75,7 +75,7 @@ function Dashboard() {
         )
         .sort((a, b) => b.created_at.localeCompare(a.created_at))
         .slice(0, 15),
-    [state.sightings, playerFilter, animalFilter],
+    [state.sightings, playerFilter, animalFilter, newestFirst],
   );
 
   return (
