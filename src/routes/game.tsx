@@ -49,6 +49,8 @@ function Dashboard() {
   /** Safari feed filters: sightings can be narrowed to one player and/or one animal. */
   const [playerFilter, setPlayerFilter] = useState<string>("all");
   const [animalFilter, setAnimalFilter] = useState<string>("all");
+  /** Safari feed time order: newest-first by default, oldest-first when browsing history. */
+  const [newestFirst, setNewestFirst] = useState(true);
   const feedPlayers = useMemo(
     () =>
       [...state.players]
