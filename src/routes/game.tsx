@@ -145,6 +145,24 @@ function Dashboard() {
             ))}
           </select>
         </div>
+        <div className="mt-2 flex gap-2">
+          {[
+            { label: "Newest first", value: true },
+            { label: "Oldest first", value: false },
+          ].map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setNewestFirst(option.value)}
+              className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
+                newestFirst === option.value
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-secondary text-muted-foreground"
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
         {feed.length === 0 ? (
           <p className="mt-3 text-sm text-muted-foreground">
             {state.sightings.length === 0
