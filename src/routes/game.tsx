@@ -49,6 +49,8 @@ function Dashboard() {
   /** Safari feed filters: sightings can be narrowed to one player and/or one animal. */
   const [playerFilter, setPlayerFilter] = useState<string>("all");
   const [animalFilter, setAnimalFilter] = useState<string>("all");
+  /** Safari feed time order: newest-first by default, oldest-first when browsing history. */
+  const [newestFirst, setNewestFirst] = useState(true);
   const feedPlayers = useMemo(
     () =>
       [...state.players]
@@ -71,9 +73,13 @@ function Dashboard() {
             (playerFilter === "all" || s.player_id === playerFilter) &&
             (animalFilter === "all" || s.animal_name === animalFilter),
         )
-        .sort((a, b) => b.created_at.localeCompare(a.created_at))
+        .sort((a, b) =>
+          newestFirst
+            ? b.created_at.localeCompare(a.created_at)
+            : a.created_at.localeCompare(b.created_at),
+        )
         .slice(0, 15),
-    [state.sightings, playerFilter, animalFilter],
+    [state.sightings, playerFilter, animalFilter, newestFirst],
   );
 
   return (
@@ -138,6 +144,24 @@ function Dashboard() {
               </option>
             ))}
           </select>
+        </div>
+        <div className="mt-2 flex gap-2">
+          {[
+            { label: "Newest first", value: true },
+            { label: "Oldest first", value: false },
+          ].map((option) => (
+            <button
+              key={String(option.value)}
+              onClick={() => setNewestFirst(option.value)}
+              className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
+                newestFirst === option.value
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-secondary text-muted-foreground"
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
         </div>
         {feed.length === 0 ? (
           <p className="mt-3 text-sm text-muted-foreground">
