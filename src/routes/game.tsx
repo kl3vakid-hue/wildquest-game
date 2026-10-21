@@ -73,7 +73,11 @@ function Dashboard() {
             (playerFilter === "all" || s.player_id === playerFilter) &&
             (animalFilter === "all" || s.animal_name === animalFilter),
         )
-        .sort((a, b) => b.created_at.localeCompare(a.created_at))
+        .sort((a, b) =>
+          newestFirst
+            ? b.created_at.localeCompare(a.created_at)
+            : a.created_at.localeCompare(b.created_at),
+        )
         .slice(0, 15),
     [state.sightings, playerFilter, animalFilter, newestFirst],
   );
