@@ -151,7 +151,7 @@ function Dashboard() {
             { label: "Oldest first", value: false },
           ].map((option) => (
             <button
-              key={option.value}
+              key={String(option.value)}
               onClick={() => setNewestFirst(option.value)}
               className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
                 newestFirst === option.value
