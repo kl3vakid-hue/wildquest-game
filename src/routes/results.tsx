@@ -88,26 +88,41 @@ function Results() {
 
         <div className="surface mt-4 p-4 text-center">
           <p className="text-sm text-muted-foreground">
-            Your score{" "}
+            {state.playMode === "groups" ? "Your group score" : "Your score"}{" "}
             <span className="display text-2xl text-gold-gradient">
-              {formatPoints(state.myScore)}
+              {formatPoints(
+                state.playMode === "groups"
+                  ? (state.groupStandings.find((g) => g.group.id === state.myGroup?.id)?.total ??
+                      0)
+                  : state.myScore,
+              )}
             </span>{" "}
             · group spotted {speciesFound} of {TOTAL_ANIMALS} species
           </p>
         </div>
 
         <ol className="mt-6 space-y-2">
-          {state.leaderboard.map((player, index) => (
-            <li
-              key={player.id}
-              className="flex items-center justify-between rounded-xl bg-secondary px-4 py-2.5 text-sm"
-            >
-              <span className="truncate">
-                {index + 1}. {player.name}
-              </span>
-              <span className="display text-lg">{formatPoints(player.score)}</span>
-            </li>
-          ))}
+          {state.playMode === "groups"
+            ? state.groupStandings.map((standing, index) => (
+                <li
+                  key={standing.group.id}
+                  className="flex items-center justify-between rounded-xl bg-secondary px-4 py-2.5 text-sm"
+                >
+                  <span className="truncate">{index + 1}. {standing.group.name}</span>
+                  <span className="display text-lg">{formatPoints(standing.total)}</span>
+                </li>
+              ))
+            : state.leaderboard.map((player, index) => (
+                <li
+                  key={player.id}
+                  className="flex items-center justify-between rounded-xl bg-secondary px-4 py-2.5 text-sm"
+                >
+                  <span className="truncate">
+                    {index + 1}. {player.name}
+                  </span>
+                  <span className="display text-lg">{formatPoints(player.score)}</span>
+                </li>
+              ))}
         </ol>
 
         <div className="mt-8">

@@ -32,6 +32,8 @@ function Rankings() {
   const navigate = useNavigate();
   const state = useGameSession();
   const [tab, setTab] = useState<"players" | "groups">("players");
+  /** In team play the host scores groups, not individuals. */
+  const activeTab: "players" | "groups" = state.playMode === "groups" ? "groups" : tab;
 
   useEffect(() => {
     if (state.ready && !state.session) navigate({ to: "/" });
