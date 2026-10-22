@@ -329,6 +329,8 @@ export function useGameSession(): GameSessionState {
     sightings,
     me,
     myGroup,
+    playMode,
+    myGroupScore,
     myGroupMembers: players.filter((p) => p.group_id === me?.group_id),
     ...derived,
     rarityLimits,
