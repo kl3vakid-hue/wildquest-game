@@ -29,7 +29,7 @@ import { queuedForPlayer, readQueue, removeQueued } from "@/services/offlineQueu
 import { cached, lastSyncedAt } from "@/services/offlineCache";
 
 import { submitQueuedSighting } from "@/services/verificationService";
-import type { Game, Group, LocalSession, Player, Sighting } from "@/types";
+import type { Game, Group, LocalSession, PlayMode, Player, Sighting } from "@/types";
 import { loadSession } from "@/utils/session";
 import { useOnlineStatus } from "./useOnlineStatus";
 
@@ -315,6 +315,10 @@ export function useGameSession(): GameSessionState {
   ]);
 
   const myGroup = groups.find((g) => g.id === me?.group_id);
+  const playMode: PlayMode = gameQuery.data?.play_mode === "groups" ? "groups" : "individual";
+  const myGroupScore = players
+    .filter((p) => p.group_id === me?.group_id)
+    .reduce((sum, m) => sum + m.score, 0);
 
   return {
     ready,
@@ -325,6 +329,8 @@ export function useGameSession(): GameSessionState {
     sightings,
     me,
     myGroup,
+    playMode,
+    myGroupScore,
     myGroupMembers: players.filter((p) => p.group_id === me?.group_id),
     ...derived,
     rarityLimits,

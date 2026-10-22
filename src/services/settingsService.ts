@@ -1,5 +1,5 @@
 import { db as supabase } from "@/lib/db";
-import type { PlayMode, RarityLimits } from "@/types";
+import type { PlayMode } from "@/types";
 import { DEFAULT_RARITY_LIMITS, normalizeLimits, type RarityLimits } from "@/lib/scoringRules";
 
 /** Reads the per-game scoring limits, falling back to the defaults. */

@@ -32,6 +32,8 @@ function Rankings() {
   const navigate = useNavigate();
   const state = useGameSession();
   const [tab, setTab] = useState<"players" | "groups">("players");
+  /** In team play the host scores groups, not individuals. */
+  const activeTab: "players" | "groups" = state.playMode === "groups" ? "groups" : tab;
 
   useEffect(() => {
     if (state.ready && !state.session) navigate({ to: "/" });
@@ -53,23 +55,29 @@ function Rankings() {
         </p>
       </div>
 
-      <div className="flex gap-2 rounded-2xl bg-secondary p-1">
-        {(["players", "groups"] as const).map((option) => (
-          <button
-            key={option}
-            onClick={() => setTab(option)}
-            className={`flex-1 rounded-xl py-2.5 text-sm font-semibold capitalize transition ${
-              tab === option
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground"
-            }`}
-          >
-            {option}
-          </button>
-        ))}
-      </div>
+      {activeTab === "players" ? (
+        <div className="flex gap-2 rounded-2xl bg-secondary p-1">
+          {(["players", "groups"] as const).map((option) => (
+            <button
+              key={option}
+              onClick={() => setTab(option)}
+              className={`flex-1 rounded-xl py-2.5 text-sm font-semibold capitalize transition ${
+                tab === option
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground"
+              }`}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          Team play is on — points go to each group, not to individual trackers.
+        </p>
+      )}
 
-      {tab === "players" ? (
+      {activeTab === "players" ? (
         <ul className="mt-4 space-y-2">
           {state.leaderboard.map((player, index) => (
             <motion.li
