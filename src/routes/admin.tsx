@@ -25,8 +25,8 @@ import {
   deleteCustomAchievement,
 } from "@/services/achievementService";
 import { overrideSighting, removePlayer, resyncAllScores } from "@/services/gameService";
-import { saveRarityLimits } from "@/services/settingsService";
-import type { Rarity } from "@/types";
+import { saveRarityLimits, setPlayMode } from "@/services/settingsService";
+import type { PlayMode, Rarity } from "@/types";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -155,6 +155,21 @@ function Admin() {
     }
   }
 
+  async function changePlayMode(mode: PlayMode) {
+    if (!state.session || !state.game || state.game.play_mode === mode) return;
+    try {
+      await setPlayMode(state.session.gameId, mode);
+      toast.success(
+        mode === "groups"
+          ? "Team play is on — points now go to each group"
+          : "Individual play is on — points go to each tracker",
+      );
+      state.refresh();
+    } catch {
+      toast.error("Could not change the play mode");
+    }
+  }
+
   async function persistLimits() {
     if (!state.session || !limits) return;
     setSaving(true);
@@ -179,6 +194,49 @@ function Admin() {
       pendingCount={state.pendingCount}
       lastSynced={state.lastSynced}
     >
+      <section>
+        <h2 className="display flex items-center gap-2 text-xl tracking-wide">
+          <Users className="size-5 text-primary" /> Play mode
+        </h2>
+        <div className="surface mt-2 p-4">
+          <p className="text-xs text-muted-foreground">
+            Decide whether each tracker scores on their own phone, or whether points earned go to
+            the group that tracker is in.
+          </p>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              aria-pressed={state.game?.play_mode !== "groups"}
+              onClick={() => void changePlayMode("individual")}
+              className={`rounded-xl border px-3 py-3 text-sm font-semibold transition ${
+                state.game?.play_mode !== "groups"
+                  ? "border-primary bg-primary/15 text-primary"
+                  : "border-border bg-secondary text-muted-foreground"
+              }`}
+            >
+              Individual play
+            </button>
+            <button
+              type="button"
+              aria-pressed={state.game?.play_mode === "groups"}
+              onClick={() => void changePlayMode("groups")}
+              className={`rounded-xl border px-3 py-3 text-sm font-semibold transition ${
+                state.game?.play_mode === "groups"
+                  ? "border-primary bg-primary/15 text-primary"
+                  : "border-border bg-secondary text-muted-foreground"
+              }`}
+            >
+              Group play
+            </button>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {state.game?.play_mode === "groups"
+              ? "Team play: every phone scores for its group. Players pick their group when they join, and rankings show groups."
+              : "Individual play: every tracker has their own score, and rankings show players."}
+          </p>
+        </div>
+      </section>
+
       <section>
         <h2 className="display flex items-center gap-2 text-xl tracking-wide">
           <ShieldAlert className="size-5 text-primary" /> Flagged sightings
