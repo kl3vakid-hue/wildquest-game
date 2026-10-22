@@ -96,11 +96,17 @@ function Dashboard() {
         className="surface p-6 text-center"
       >
         <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">
-          Your Score
+          {state.playMode === "groups" ? "Your Group Score" : "Your Score"}
         </p>
         <p className="display mt-1 text-7xl leading-none text-gold-gradient">
-          {formatPoints(state.myScore)}
+          {formatPoints(state.playMode === "groups" ? state.myGroupScore : state.myScore)}
         </p>
+        {state.playMode === "groups" ? (
+          <p className="mt-1 text-xs text-muted-foreground">
+            Team play — points go to {state.myGroup?.name ?? "your group"} ·{" "}
+            {formatPoints(state.myScore)} personal
+          </p>
+        ) : null}
         <p className="mt-3 text-sm text-muted-foreground">
           Animals spotted: {found} / {TOTAL_ANIMALS}
         </p>
