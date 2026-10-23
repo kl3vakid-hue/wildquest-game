@@ -31,6 +31,8 @@ export interface Group {
   id: string;
   game_id: string;
   name: string;
+  /** Stored group total, kept in sync by a database trigger (sum of member scores). */
+  score?: number;
   created_at: string;
 }
 
