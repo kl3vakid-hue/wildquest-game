@@ -11,4 +11,4 @@
 
 ## Architecture rules
 
-- Play mode (`games.play_mode`, host-set from the admin dashboard: `individual` | `groups`) is display-level only: player scores are always computed and stored per player, and group totals are always summed client-side from member scores. Never write scores to `groups` rows — non-host devices cannot update `groups` under RLS, and the summed display keeps offline and mode-switch behaviour automatic.
+- Play mode (`games.play_mode`, host-set from the admin dashboard: `individual` | `groups`): group scoring reads the stored `groups.score`, which a database trigger (`sync_group_score` on `players`) keeps equal to the sum of member player scores. Never write group scores from client code and never bypass the trigger — non-host devices cannot update `groups` under RLS, and the trigger keeps the stored total correct for every path (sightings, overrides, achievement resyncs, players joining/leaving).

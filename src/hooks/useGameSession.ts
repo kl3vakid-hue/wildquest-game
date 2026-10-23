@@ -283,7 +283,7 @@ export function useGameSession(): GameSessionState {
         return {
           group,
           members,
-          total: members.reduce((sum, m) => sum + m.score, 0),
+          total: group.score ?? members.reduce((sum, m) => sum + m.score, 0),
           animalsFound: new Set(groupSightings.map((s) => s.animal_id)).size,
         };
       })
@@ -316,9 +316,10 @@ export function useGameSession(): GameSessionState {
 
   const myGroup = groups.find((g) => g.id === me?.group_id);
   const playMode: PlayMode = gameQuery.data?.play_mode === "groups" ? "groups" : "individual";
-  const myGroupScore = players
-    .filter((p) => p.group_id === me?.group_id)
-    .reduce((sum, m) => sum + m.score, 0);
+  /** Group play reads the group's stored total; the member sum is the fallback for stale cached rows. */
+  const myGroupScore =
+    myGroup?.score ??
+    players.filter((p) => p.group_id === me?.group_id).reduce((sum, m) => sum + m.score, 0);
 
   return {
     ready,

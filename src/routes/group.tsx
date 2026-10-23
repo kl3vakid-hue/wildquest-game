@@ -39,7 +39,7 @@ function GroupScreen() {
 
   const memberIds = new Set(state.myGroupMembers.map((m) => m.id));
   const recent = state.sightings.filter((s) => memberIds.has(s.player_id)).slice(0, 12);
-  const groupTotal = state.myGroupMembers.reduce((sum, m) => sum + m.score, 0);
+  const groupTotal = state.myGroupScore;
 
   return (
     <ScreenShell
