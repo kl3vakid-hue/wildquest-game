@@ -14,6 +14,11 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { setupOfflineSupport } from "../lib/pwa";
 
+// Runs as soon as the module loads on the client — not inside an effect — so
+// offline support never depends on React mounting (hydration timing on the
+// published app previously left the offline worker unregistered entirely).
+setupOfflineSupport();
+
 
 function NotFoundComponent() {
   return (
@@ -137,15 +142,6 @@ function RootShell({ children }: { children: ReactNode }) {
 }
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
-
-  // Makes the published app installable and openable without signal.
-  useEffect(() => {
-    setupOfflineSupport();
-  }, []);
-
-
-
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}

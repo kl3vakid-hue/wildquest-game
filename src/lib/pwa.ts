@@ -48,9 +48,14 @@ export function setupOfflineSupport(): void {
     return;
   }
 
-  window.addEventListener("load", () => {
+  // Register right away when the page already finished loading — on the
+  // published app the component often mounts after the `load` event, so a
+  // load-only listener never fires and offline support silently never starts.
+  const register = () => {
     void navigator.serviceWorker.register(SW_URL, { scope: "/" }).catch(() => {
       /* offline support is best-effort */
     });
-  });
+  };
+  if (document.readyState === "complete") register();
+  else window.addEventListener("load", register, { once: true });
 }
