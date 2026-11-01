@@ -1,4 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
+import { isNetworkError } from "@/lib/network";
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 
