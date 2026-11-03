@@ -90,7 +90,9 @@ export function useGameSession(): GameSessionState {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    setSession(loadSession());
+    const loaded = loadSession();
+    console.log("[session-debug] loadSession ->", loaded ? loaded.gameId.slice(0, 8) : "null");
+    setSession(loaded);
     setReady(true);
   }, []);
 
