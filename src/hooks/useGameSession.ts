@@ -90,7 +90,9 @@ export function useGameSession(): GameSessionState {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    setSession(loadSession());
+    const loaded = loadSession();
+    console.log("[session-debug] loadSession ->", loaded ? loaded.gameId.slice(0, 8) : "null");
+    setSession(loaded);
     setReady(true);
   }, []);
 
@@ -102,7 +104,10 @@ export function useGameSession(): GameSessionState {
   // to the copy stored on the device, so screens still work with no signal.
   const gameQuery = useQuery({
     queryKey: ["game", gameId],
-    queryFn: () => cached(`game.${gameId}`, () => fetchGame(gameId!)),
+    queryFn: () => {
+      console.log("[session-debug] game queryFn runs, gameId =", gameId);
+      return cached(`game.${gameId}`, () => fetchGame(gameId!));
+    },
     enabled: Boolean(gameId),
     refetchInterval: 3000,
     refetchOnWindowFocus: true,

@@ -47,7 +47,9 @@ export async function cached<T>(key: string, fetcher: () => Promise<T>): Promise
     writeCache(key, value);
     return value;
   } catch (error) {
+    console.log("[offline-debug] fetch failed for", key, String(error).slice(0, 120));
     const fallback = readCache<T>(key);
+    console.log("[offline-debug] fallback for", key, fallback === null ? "NONE" : "present");
     if (fallback !== null) return fallback;
     throw error;
   }
