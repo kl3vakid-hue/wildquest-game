@@ -42,14 +42,19 @@ export function lastSyncedAt(): string | null {
  * airplane mode) the last remembered value is returned instead of an error.
  */
 export async function cached<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+  // With no connection the live fetch is guaranteed to fail — and the query
+  // library retries failures with multi-second backoff — so serve the stored
+  // copy straight away instead of leaving screens empty while it spins.
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
+    const offline = readCache<T>(key);
+    if (offline !== null) return offline;
+  }
   try {
     const value = await fetcher();
     writeCache(key, value);
     return value;
   } catch (error) {
-    console.log("[offline-debug] fetch failed for", key, String(error).slice(0, 120));
     const fallback = readCache<T>(key);
-    console.log("[offline-debug] fallback for", key, fallback === null ? "NONE" : "present");
     if (fallback !== null) return fallback;
     throw error;
   }
