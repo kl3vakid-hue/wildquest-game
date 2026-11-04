@@ -70,6 +70,11 @@ async function raceWithStoredCopy<T>(key: string, live: Promise<T>): Promise<T> 
   const stored = readCache<T>(key);
   if (stored === null) return live;
 
+  // Whatever the live fetch settles with keeps the stored copy fresh.
+  live.then((value) => writeCache(key, value)).catch(() => {
+    /* its failure is handled by the caller or the stale copy */
+  });
+
   let timer: ReturnType<typeof setTimeout> | undefined;
   const staleCopy = new Promise<T | undefined>((resolve) => {
     timer = setTimeout(() => resolve(stored), FALLBACK_DELAY_MS);
