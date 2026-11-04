@@ -26,6 +26,7 @@ export function readCache<T>(key: string): T | null {
 
 export function writeCache<T>(key: string, value: T): void {
   try {
+    console.log("[oc-debug] writeCache", key);
     store()?.setItem(PREFIX + key, JSON.stringify(value));
     store()?.setItem(STAMP_KEY, new Date().toISOString());
   } catch {
