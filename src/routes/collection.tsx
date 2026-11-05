@@ -201,6 +201,26 @@ function Collection() {
                     "A rare find — keep exploring to learn more about this species."}
                 </p>
               </div>
+              <div className="mt-3 rounded-2xl bg-secondary/60 p-3">
+                <div className="flex items-center gap-2">
+                  <PawPrint className="size-4 shrink-0 text-primary" />
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Spoor · footprint
+                  </p>
+                </div>
+                {ANIMAL_TRACKS[selected.id] ? (
+                  <img
+                    src={ANIMAL_TRACKS[selected.id]}
+                    alt={`${selected.name} footprint`}
+                    loading="lazy"
+                    className="mx-auto mt-2 h-32 w-full rounded-xl bg-background object-contain p-2"
+                  />
+                ) : (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Spoor not on record for this species yet — ask your guide to point it out.
+                  </p>
+                )}
+              </div>
             </div>
           </motion.div>
         </div>
