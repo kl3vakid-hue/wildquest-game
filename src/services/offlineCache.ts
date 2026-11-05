@@ -26,7 +26,6 @@ export function readCache<T>(key: string): T | null {
 
 export function writeCache<T>(key: string, value: T): void {
   try {
-    console.log("[oc-debug] writeCache", key);
     store()?.setItem(PREFIX + key, JSON.stringify(value));
     store()?.setItem(STAMP_KEY, new Date().toISOString());
   } catch {
@@ -69,23 +68,20 @@ export async function cached<T>(key: string, fetcher: () => Promise<T>): Promise
  */
 async function raceWithStoredCopy<T>(key: string, live: Promise<T>): Promise<T> {
   const stored = readCache<T>(key);
-  if (stored === null) return live;
 
-  // Whatever the live fetch settles with keeps the stored copy fresh.
+  // Whatever the live fetch settles with keeps the stored copy fresh — this
+  // must run on every call, including the very first one that seeds the cache.
   live.then((value) => writeCache(key, value)).catch(() => {
     /* its failure is handled by the caller or the stale copy */
   });
+
+  if (stored === null) return live;
 
   let timer: ReturnType<typeof setTimeout> | undefined;
   const staleCopy = new Promise<T | undefined>((resolve) => {
     timer = setTimeout(() => resolve(stored), FALLBACK_DELAY_MS);
   });
-  live.catch(() => {
-    /* handled by the await below or by the stale copy already winning */
-  });
   const winner = await Promise.race([live, staleCopy]);
   clearTimeout(timer);
-  if (winner === undefined) return stored;
-  writeCache(key, winner);
-  return winner;
+  return winner === undefined ? stored : winner;
 }

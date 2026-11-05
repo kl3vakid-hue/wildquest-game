@@ -14,9 +14,6 @@ export const getRouter = () => {
       },
     },
   });
-  if (typeof window !== "undefined") {
-    (window as unknown as { __qc?: QueryClient }).__qc = queryClient;
-  }
 
   const router = createRouter({
     routeTree,
