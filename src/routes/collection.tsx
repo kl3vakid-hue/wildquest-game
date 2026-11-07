@@ -6,7 +6,7 @@ import { ScreenShell } from "@/components/ScreenShell";
 import { ANIMALS, RARITY_ORDER, TOTAL_ANIMALS } from "@/data/animals";
 import { ANIMAL_FACTS } from "@/data/animalFacts";
 import { ANIMAL_PHOTOS } from "@/data/animalPhotos";
-import { ANIMAL_TRACKS } from "@/data/animalTracks";
+import { ANIMAL_TRACK_NOTES, ANIMAL_TRACKS } from "@/data/animalTracks";
 import { Lightbulb, PawPrint, X } from "lucide-react";
 import { AI_ANIMAL_RARITY, isAiAnimalId } from "@/data/discovered";
 import { useGameSession } from "@/hooks/useGameSession";
@@ -213,13 +213,13 @@ function Collection() {
                     src={ANIMAL_TRACKS[selected.id]}
                     alt={`${selected.name} footprint`}
                     loading="lazy"
-                    className="mx-auto mt-2 h-32 w-full rounded-xl bg-background object-contain p-2"
+                    className="mt-2 h-32 w-full rounded-xl object-cover"
                   />
-                ) : (
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Spoor not on record for this species yet — ask your guide to point it out.
-                  </p>
-                )}
+                ) : null}
+                <p className="mt-2 text-sm text-foreground">
+                  {ANIMAL_TRACK_NOTES[selected.id] ??
+                    "Spoor not on record for this species yet — ask your guide to point it out."}
+                </p>
               </div>
             </div>
           </motion.div>

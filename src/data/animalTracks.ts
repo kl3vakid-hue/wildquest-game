@@ -1,0 +1,67 @@
+// Real spoor photos (Wikimedia Commons) where a verified track photo exists,
+// plus a field-guide description of every species' footprint.
+import aardvark from "@/assets/tracks/aardvark.jpg";
+import hyena from "@/assets/tracks/hyena.jpg";
+import impala from "@/assets/tracks/impala.jpg";
+import lion from "@/assets/tracks/lion.jpg";
+import leopardTortoise from "@/assets/tracks/leopard-tortoise.jpg";
+
+export const ANIMAL_TRACKS: Record<string, string> = {
+  aardvark,
+  hyena,
+  impala,
+  lion,
+  "leopard-tortoise": leopardTortoise,
+};
+
+export const ANIMAL_TRACK_NOTES: Record<string, string> = {
+  leopard: "Round cat print about 9 cm wide: four toes, no claw marks, and a three-lobed heel pad.",
+  pangolin: "Walks on its hind legs, leaving small oval prints with the tail dragging a line between them.",
+  lion: "Large round cat print up to 12 cm wide, four teardrop toes, no claws and a broad three-lobed pad.",
+  "wild-dog": "Dog-like print about 7 cm long with four toes and clear claw marks; the two middle toes are joined at the base.",
+  cheetah: "Narrower than a leopard's print, and the blunt claws usually show because cheetahs can't fully retract them.",
+  aardvark: "Spade-like prints showing four toes in front and five behind, often next to fresh digging.",
+  caracal: "Small round cat print about 5 cm wide with four toes and no claw marks.",
+  "black-rhino": "Three rounded toes around a large pad about 22 cm across; the rear edge of the pad is curved.",
+  serval: "Small cat print about 4–5 cm with long, oval toes, often found in damp grass near water.",
+  hyena: "Four toes with blunt claw marks; the front feet are clearly larger than the back feet.",
+  "honey-badger": "Five toes with long claw marks on the front feet; it walks with a pigeon-toed shuffle.",
+  sable: "Large pointed hoof prints about 9 cm long, heavier and blunter at the tip than a kudu's.",
+  roan: "Similar to sable — broad cloven hoof about 9–10 cm with rounded tips.",
+  porcupine: "Five-toed prints with a pebbly sole texture; quills sometimes scratch the ground behind.",
+  "white-rhino": "Three-toed print up to 30 cm wide; the rear of the pad has a notch, unlike the black rhino's.",
+  crocodile: "Five-toed front and four-toed webbed back prints, either side of a deep tail-drag groove.",
+  elephant: "Huge round prints up to 50 cm across with a cracked, crazy-paving pattern in the sole.",
+  hippo: "Four rounded toes spread like a clover, about 25 cm wide, on well-worn paths leading to water.",
+  eland: "Big, rounded cloven hoof up to 12 cm — the largest antelope track, often splayed apart.",
+  jackal: "Small oval dog print about 5 cm with four toes and claw marks; the two front toes lie close together.",
+  klipspringer: "Tiny, blunt, rounded hooves about 3 cm long — it walks on its hoof tips on rocky ground.",
+  ostrich: "Huge two-toed bird print about 20 cm long; only the big inner toe really presses into the sand.",
+  buffalo: "Large rounded cloven hoof about 13 cm wide, similar to cattle, usually in big herds.",
+  nyala: "Pointed, heart-shaped cloven hoof about 6 cm long, often in thick riverside bush.",
+  waterbuck: "Broad, slightly splayed cloven hoof about 8 cm long, near rivers and dams.",
+  giraffe: "Large, square-tipped cloven hoof up to 20 cm long, with a long gap between prints.",
+  bushbuck: "Neat, narrow cloven hoof about 5 cm long with pointed tips.",
+  duiker: "Small pointed cloven hoof about 4 cm, leaving narrow heart-shaped marks.",
+  kudu: "Long, pointed heart-shaped hoof about 8 cm; bulls leave noticeably larger prints.",
+  wildebeest: "Blocky cloven hoof about 9 cm, wider at the front, usually in large trampled herds.",
+  baboon: "Hand-like prints: a long human-like palm with five fingers and a thumb set to the side.",
+  zebra: "Single round hoof about 12 cm, like a small horse's — no split in the middle.",
+  vervet: "Tiny hand-shaped prints with five slender fingers, often under fruiting trees.",
+  warthog: "Small rounded cloven hoof with two dewclaw dots behind it, often by burrows and wallows.",
+  impala: "Neat, pointed heart-shaped hoof about 5 cm long — the most common track in the bushveld.",
+  "fishing-owl": "Owl prints show two toes pointing forward and two back (X-shaped); this owl has spiky, bare soles.",
+  "black-mamba": "No footprints — a smooth, wavy S-shaped trail through loose sand.",
+  "rock-python": "A broad, straight caterpillar-like trail; pythons often move in a straight line.",
+  chameleon: "Tiny paired tong-like prints in a slow, careful line, with an occasional tail mark.",
+  "ground-hornbill": "Big three-toed forward-facing bird prints, about 10 cm, walking in a steady stride.",
+  "saddle-billed-stork": "Long three-toed prints with a small back toe, found in mud along rivers and pans.",
+  "puff-adder": "A wide, straight trail like a tyre track — puff adders move by creeping forward in a line.",
+  "kori-bustard": "Three short, thick forward toes and no back toe, in a slow walking line.",
+  "nile-monitor": "Five-toed prints with long claws on either side of a sweeping tail mark.",
+  "fish-eagle": "Large prints with three forward toes and one back toe, with deep talon marks, near water.",
+  marabou: "Large three-toed prints with a short back toe, often around carcasses and rubbish sites.",
+  "leopard-tortoise": "Two rows of stubby round prints with a dragging shell mark, heading straight through the veld.",
+  "lilac-breasted-roller": "Rarely seen on the ground — tiny prints with two toes forward and one back.",
+  guineafowl: "Three-toed bird prints about 6 cm, in busy, crisscrossing flocks along roads.",
+};
